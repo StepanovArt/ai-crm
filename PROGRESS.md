@@ -1,7 +1,7 @@
 # Progress
 
 ## Current phase
-Phase 3 — App shell & design system
+Phase 4 — Records UI
 
 ## Phase 0 — Scaffold ✅
 - [x] Monorepo layout, docker-compose (Postgres 16), `.env.example`, Makefile
@@ -28,8 +28,17 @@ Phase 3 — App shell & design system
 - [x] `make types` → `apps/web/src/lib/api/schema.d.ts`; openapi-fetch client in `src/lib/api/client.ts`
 - [x] 74 pytest tests (happy + error path per router, HTTP-level isolation)
 
+## Phase 3 — App shell & design system ✅
+- [x] Tokens (light/dark), hand-written shadcn primitives (button, input, dialog, dropdown, popover, select, tabs, command, checkbox, switch, tooltip, badge, card, skeleton, kbd)
+- [x] Sidebar (collapsible, terminology-aware labels, overdue badge, workspace switcher with theme / reset demo / sign out), Topbar (breadcrumbs, ⌘K trigger, Ask AI, avatar)
+- [x] Auth pages (login with "Explore the demo workspace", signup), middleware + client-side auth gate, onboarding redirect
+- [x] Shared: PageHeader, EmptyState, Skeleton, Avatar/CompanyLogo, StatusBadge/LeadStatusBadge, ScoreBadge (lazy breakdown tooltip), MoneyText, RelativeDate, AgentBadge
+- [x] `data-agent-id` helpers (`lib/agent-ids.ts`), query key factory (`lib/query-keys.ts`), global shortcuts (⌘K, ⌘J, G-sequences)
+- [x] Playwright: login redirect + sign-in + nav; wrong password
+- Screens: `docs/screens/phase-3/`
+
 ## Next
-- Phase 3: design system primitives, sidebar (terminology-aware), topbar, auth pages, protected routes, shared components
+- Phase 4: DataTable + FieldRenderer/FieldEditor, companies/contacts/deals tables, record detail, tasks page
 
 ## Known issues
 - none
