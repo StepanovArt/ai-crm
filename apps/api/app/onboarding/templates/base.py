@@ -43,6 +43,12 @@ class Flavor:
     call_summaries: tuple[str, ...] = ()
     note_bodies: tuple[str, ...] = ()
     task_titles: tuple[str, ...] = ()
+    # Companies have web domains (False for households etc.).
+    domains: bool = True
+    # When set, contact emails use these personal domains instead of the company domain.
+    personal_email_domains: tuple[str, ...] = ()
+    # Values for the {unit} placeholder in deal patterns.
+    unit_prefixes: tuple[str, ...] = ("A", "B", "C")
 
 
 @dataclass(frozen=True)

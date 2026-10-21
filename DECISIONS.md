@@ -45,3 +45,10 @@ One line per decision: what and why.
 - 2026-10-21 — `move_card` is applied to the cached board (same `applyMove` as drag & drop) so motion's `layoutId` animates the card between columns; the server refetch that follows confirms the persisted position.
 - 2026-10-21 — "Save as note" and "Create task" on agent cards are direct user actions (REST), not agent mutations, so they don't need a plan; agent-proposed changes always go through plans.
 - 2026-10-21 — Pages that sit beside the agent panel (Today, record detail, table toolbars) use container queries rather than viewport breakpoints.
+- 2026-10-21 — Onboarding builds the whole workspace in one transaction and commits only at the end: a dropped connection leaves the workspace pending and onboarding can simply be retried. A `SELECT … FOR UPDATE` on the workspace row serialises concurrent runs.
+- 2026-10-21 — Template matching: keywords match on word boundaries; multi-word phrases score per word; ties go to the template whose first match appears earliest in the sentence (usually its subject — "a recruitment agency placing software engineers" → recruitment).
+- 2026-10-21 — Onboarding events are their own typed union (`onboarding/events.py`, exposed via `GET /onboarding/events/schema`); `done` step events carry preview data (terminology, stages, fields, counts, sample names, sample deals) so the frontend skeleton never needs extra requests.
+- 2026-10-21 — "Skip, use demo workspace" fills the new user's own workspace from the B2B template instantly (`POST /onboarding/demo`) instead of sharing the global demo workspace, so their data is theirs to change.
+- 2026-10-21 — New workspaces are seeded from `workspace_id.int` so seeded ids never collide across workspaces; sample teammates get `team-<id>.example.com` emails and an unusable password hash.
+- 2026-10-21 — The seed builder only draws a unit number when a deal pattern uses `{unit}`, so adding real-estate patterns didn't shift the demo workspace's deterministic data.
+- 2026-10-21 — The SSE client is generic (`streamSSE<E>`), shared by the agent and onboarding streams.

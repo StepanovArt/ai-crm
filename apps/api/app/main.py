@@ -16,6 +16,7 @@ from app.routers import (
     fields,
     health,
     notes,
+    onboarding,
     pipelines,
     tasks,
     workspaces,
@@ -56,6 +57,7 @@ def create_app() -> FastAPI:
         notes,
         activities,
         dashboard,
+        onboarding,
         agent,
         demo,
     ):

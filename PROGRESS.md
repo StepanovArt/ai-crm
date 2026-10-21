@@ -1,7 +1,7 @@
 # Progress
 
 ## Current phase
-Phase 8 — Onboarding & universality
+Phase 9 — Polish & demo readiness
 
 ## Phase 0 — Scaffold ✅
 - [x] Monorepo layout, docker-compose (Postgres 16), `.env.example`, Makefile
@@ -75,8 +75,16 @@ Phase 8 — Onboarding & universality
 - [x] Playwright: S2 plan → approve → tasks → undo; S3 card moves columns → undo; ⌘K Ask AI chart; insight → draft → save note
 - Screens: `docs/screens/phase-7/`
 
+## Phase 8 — Onboarding & universality ✅
+- [x] 5 industry templates (`b2b_saas`, `real_estate`, `industrial_equipment`, `agency_services`, `recruitment`): terminology, 7-stage pipeline with probabilities, 4–6 custom fields per object, curated names/titles/emails/meetings/notes/tasks; seed builder supports households (no domains), personal email domains and unit numbers
+- [x] `onboarding/generator.py`: word-boundary keyword matching (phrases weigh more, earliest match breaks ties, default `b2b_saas`) and a streamed, single-transaction build (thinking → template + step outline → each step running/done with preview data → done)
+- [x] `POST /onboarding/generate` (SSE), `POST /onboarding/demo` (skip → instant build), `GET /onboarding/templates`; 409 once onboarded; row lock against concurrent runs; teammates get per-workspace emails and unusable passwords
+- [x] `/onboarding`: one-sentence prompt + 5 example chips + "Skip, use demo workspace"; split screen with steps checking off and a live app skeleton (sidebar relabels to the new vocabulary with counts, kanban columns drop in one by one, sample deals and custom fields fill in) → Today
+- [x] Tests: template matching + completeness, real-estate DoD (stages, fields, terminology, 30/60/25 records, hot leads, tasks), skip path, two workspaces don't collide (114 API tests); reducer unit tests; Playwright signup → apartments → Today/pipeline and skip path
+- Screens: `docs/screens/phase-8/`
+
 ## Next
-- Phase 8: 5 industry templates, streaming onboarding generator, split-screen onboarding with live skeleton, demo-workspace path
+- Phase 9: visual polish pass, shortcuts help dialog, 500-row performance + N+1 check, accessibility, README with screenshots/architecture/demo script, fresh-clone check
 
 ## Known issues
 - none

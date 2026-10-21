@@ -248,7 +248,7 @@ class WorkspaceBuilder:
                 id=self.uid(),
                 workspace_id=self.workspace.id,
                 name=name,
-                domain=f"{slug}{flavor.tlds[i % len(flavor.tlds)]}",
+                domain=f"{slug}{flavor.tlds[i % len(flavor.tlds)]}" if flavor.domains else None,
                 industry=self.rng.choice(flavor.industries),
                 size=self.rng.choice(flavor.sizes),
                 owner_id=self.pick_owner().id,
@@ -266,7 +266,10 @@ class WorkspaceBuilder:
             company = self.companies[i % len(self.companies)] if self.companies else None
             first, last = self.fake.first_name(), self.fake.last_name()
             title = flavor.titles[(i * 7 + self.rng.randint(0, 3)) % len(flavor.titles)]
-            domain = company.domain if company and company.domain else "example.com"
+            if flavor.personal_email_domains:
+                domain = self.rng.choice(flavor.personal_email_domains)
+            else:
+                domain = company.domain if company and company.domain else "example.com"
             slug = f"{first}-{last}".lower()
             contact = Contact(
                 id=self.uid(),
@@ -316,7 +319,13 @@ class WorkspaceBuilder:
             stage = self.stages[stage_index]
             created = self.ago(self.rng.uniform(12, 58))
             pattern = flavor.deal_patterns[i % len(flavor.deal_patterns)]
-            name = pattern.format(company=company.name, first=contact.first_name if contact else "")
+            unit = ""
+            if "{unit}" in pattern:  # only draw when used, so other templates' data stays stable
+                prefix = self.rng.choice(flavor.unit_prefixes)
+                unit = f"{prefix}-{self.rng.randint(1, 24)}{self.rng.randint(1, 12):02d}"
+            name = pattern.format(
+                company=company.name, first=contact.first_name if contact else "", unit=unit
+            )
             value = Decimal(int(self.rng.uniform(lo, hi) / 500) * 500)
             is_open = stage.kind == "open"
             # Roughly every 4th open deal (but never in the first stage) goes stale.

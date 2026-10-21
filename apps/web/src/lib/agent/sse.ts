@@ -12,11 +12,11 @@ export class StreamError extends Error {
   }
 }
 
-type StreamOptions = {
+type StreamOptions<E> = {
   method?: "GET" | "POST";
   body?: unknown;
   signal?: AbortSignal;
-  onEvent: (event: AgentEvent) => void;
+  onEvent: (event: E) => void;
   /** Retries only happen if the connection fails before the first event (safe to resend). */
   retries?: number;
 };
@@ -48,7 +48,7 @@ async function errorMessage(res: Response): Promise<string> {
 }
 
 /** fetch + ReadableStream SSE client (EventSource can't POST or send credentials cross-origin). */
-export async function streamAgent(path: string, opts: StreamOptions): Promise<void> {
+export async function streamSSE<E>(path: string, opts: StreamOptions<E>): Promise<void> {
   const retries = opts.retries ?? 2;
   let received = false;
   for (let attempt = 0; ; attempt++) {
@@ -72,7 +72,7 @@ export async function streamAgent(path: string, opts: StreamOptions): Promise<vo
         buffer = rest;
         for (const raw of events) {
           received = true;
-          opts.onEvent(JSON.parse(raw) as AgentEvent);
+          opts.onEvent(JSON.parse(raw) as E);
         }
       }
       return;
@@ -86,4 +86,8 @@ export async function streamAgent(path: string, opts: StreamOptions): Promise<vo
       await new Promise((r) => setTimeout(r, 400 * (attempt + 1)));
     }
   }
+}
+
+export function streamAgent(path: string, opts: StreamOptions<AgentEvent>): Promise<void> {
+  return streamSSE<AgentEvent>(path, opts);
 }

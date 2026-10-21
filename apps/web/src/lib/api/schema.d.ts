@@ -518,6 +518,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/onboarding/templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Templates
+         * @description Industry templates, with the example sentences shown as chips.
+         */
+        get: operations["list_templates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/onboarding/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generate Workspace
+         * @description Build the workspace from a one-line business description. Streams OnboardingEvents.
+         */
+        post: operations["generate_workspace"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/onboarding/demo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Use Demo Workspace
+         * @description Skip the description and fill the workspace with the demo B2B template instantly.
+         */
+        post: operations["use_demo_workspace"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/onboarding/events/schema": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Onboarding Events Schema
+         * @description Exposes the OnboardingEvent union in OpenAPI so the web client gets generated types.
+         */
+        get: operations["onboarding_events_schema"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/agent/chat": {
         parameters: {
             query?: never;
@@ -1286,6 +1366,19 @@ export interface components {
             /** Agent Touched At */
             agent_touched_at: string | null;
         };
+        /** DealPreview */
+        DealPreview: {
+            /** Name */
+            name: string;
+            /** Stage Index */
+            stage_index: number;
+            /** Value */
+            value: string;
+            /** Currency */
+            currency: string;
+            /** Company */
+            company?: string | null;
+        };
         /** DealUpdate */
         DealUpdate: {
             /** Name */
@@ -1308,6 +1401,11 @@ export interface components {
             custom?: {
                 [key: string]: unknown;
             } | null;
+        };
+        /** DemoIn */
+        DemoIn: {
+            /** Template */
+            template?: string | null;
         };
         /** EmailDraft */
         EmailDraft: {
@@ -1425,6 +1523,15 @@ export interface components {
             /** Color */
             color: string;
         };
+        /** FieldPreview */
+        FieldPreview: {
+            /** Object Type */
+            object_type: string;
+            /** Label */
+            label: string;
+            /** Type */
+            type: string;
+        };
         /** FieldReorder */
         FieldReorder: {
             /**
@@ -1434,6 +1541,11 @@ export interface components {
             object_type: "company" | "contact" | "deal";
             /** Field Ids */
             field_ids: string[];
+        };
+        /** GenerateIn */
+        GenerateIn: {
+            /** Description */
+            description: string;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -1682,6 +1794,109 @@ export interface components {
              * @default true
              */
             ok: boolean;
+        };
+        /** OnboardingDoneEvent */
+        OnboardingDoneEvent: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "done";
+            /** Workspace Id */
+            workspace_id: string;
+            /**
+             * Redirect
+             * @default /today
+             */
+            redirect?: string;
+        };
+        /** OnboardingErrorEvent */
+        OnboardingErrorEvent: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "error";
+            /** Message */
+            message: string;
+        };
+        /** OnboardingStepEvent */
+        OnboardingStepEvent: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "step";
+            /**
+             * Id
+             * @enum {string}
+             */
+            id: "terminology" | "pipeline" | "fields" | "companies" | "contacts" | "deals" | "history" | "tasks";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "running" | "done";
+            /** Label */
+            label: string;
+            /** Detail */
+            detail?: string | null;
+            /** Terminology */
+            terminology?: {
+                [key: string]: string;
+            } | null;
+            /** Stages */
+            stages?: components["schemas"]["StagePreview"][] | null;
+            /** Fields */
+            fields?: components["schemas"]["FieldPreview"][] | null;
+            /** Count */
+            count?: number | null;
+            /** Samples */
+            samples?: string[] | null;
+            /** Deals */
+            deals?: components["schemas"]["DealPreview"][] | null;
+        };
+        /** OnboardingTemplateEvent */
+        OnboardingTemplateEvent: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "template";
+            /** Key */
+            key: string;
+            /** Name */
+            name: string;
+            /** Tagline */
+            tagline: string;
+            /** Matched */
+            matched: string[];
+            /** Steps */
+            steps: components["schemas"]["StepOutline"][];
+        };
+        /** OnboardingTemplateOut */
+        OnboardingTemplateOut: {
+            /** Key */
+            key: string;
+            /** Name */
+            name: string;
+            /** Tagline */
+            tagline: string;
+            /** Example Prompt */
+            example_prompt: string;
+            terminology: components["schemas"]["Terminology"];
+            /** Stages */
+            stages: string[];
+        };
+        /** OnboardingThinkingEvent */
+        OnboardingThinkingEvent: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "thinking";
+            /** Text */
+            text: string;
         };
         /** OpenRecordAction */
         OpenRecordAction: {
@@ -2011,6 +2226,17 @@ export interface components {
             /** Kind */
             kind: string;
         };
+        /** StagePreview */
+        StagePreview: {
+            /** Name */
+            name: string;
+            /** Color */
+            color: string;
+            /** Kind */
+            kind: string;
+            /** Probability */
+            probability: number;
+        };
         /** StageReorder */
         StageReorder: {
             /** Stage Ids */
@@ -2044,6 +2270,16 @@ export interface components {
             probability?: number | null;
             /** Kind */
             kind?: string | null;
+        };
+        /** StepOutline */
+        StepOutline: {
+            /**
+             * Id
+             * @enum {string}
+             */
+            id: "terminology" | "pipeline" | "fields" | "companies" | "contacts" | "deals" | "history" | "tasks";
+            /** Label */
+            label: string;
         };
         /** TaskCreate */
         TaskCreate: {
@@ -3905,6 +4141,112 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TodayOut"];
+                };
+            };
+        };
+    };
+    list_templates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OnboardingTemplateOut"][];
+                };
+            };
+        };
+    };
+    generate_workspace: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenerateIn"];
+            };
+        };
+        responses: {
+            /** @description Stream of AgentEvent JSON objects */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    use_demo_workspace: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["DemoIn"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    onboarding_events_schema: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": (components["schemas"]["OnboardingThinkingEvent"] | components["schemas"]["OnboardingTemplateEvent"] | components["schemas"]["OnboardingStepEvent"] | components["schemas"]["OnboardingDoneEvent"] | components["schemas"]["OnboardingErrorEvent"])[];
                 };
             };
         };

@@ -170,6 +170,8 @@ async def contact_insight(ctx: Ctx, contact_id: uuid.UUID) -> Insight:
     reasons = [s.label.lower() for s in breakdown.reasons if s.weight > 0][:3]
     if reasons:
         bullets.append(f"Score {breakdown.score} — " + ", ".join(reasons))
+    if not bullets:
+        bullets.append(f"Score {breakdown.score} — no engagement signals yet")
 
     if eng.last is None:
         headline, tone = "New — no conversations yet", "neutral"
