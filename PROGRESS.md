@@ -1,7 +1,7 @@
 # Progress
 
 ## Current phase
-Phase 5 — Pipeline & Today
+Phase 6 — Agent backend
 
 ## Phase 0 — Scaffold ✅
 - [x] Monorepo layout, docker-compose (Postgres 16), `.env.example`, Makefile
@@ -48,8 +48,16 @@ Phase 5 — Pipeline & Today
 - [x] Playwright: create → inline edit → delete company; API-created custom field shows in table + detail; note on timeline; complete task
 - Screens: `docs/screens/phase-4/`
 
+## Phase 5 — Pipeline & Today ✅
+- [x] Kanban (dnd-kit multi-container sortable + drag overlay), optimistic move with rollback (`applyMove`, unit-tested), column count/total/weighted, owner/value/close-date filters (URL), add deal per stage
+- [x] Cards: name, company, value, owner, days-in-stage (amber when stale), AI sparkle when agent-touched; motion layout animations ready for agent `move_card`
+- [x] Today: greeting, AI briefing slot (placeholder until Phase 7), stat tiles, "Who to contact next" (score + reason chips + open deal), my due tasks, open value by stage, going-stale list
+- [x] Settings: custom fields (add/edit options/colours/reorder/delete), pipelines & stages (rename, colour, probability, kind, reorder, add/delete), workspace name + terminology
+- [x] Playwright: drag & drop persists + writes activity; settings field → table; terminology → nav; new stage → kanban column
+- Screens: `docs/screens/phase-5/`
+
 ## Next
-- Phase 5: kanban (dnd-kit, optimistic move + rollback, column totals, filters), Today dashboard, Settings (fields, pipelines/stages, terminology)
+- Phase 6: agent events, tools, orchestrator, mock provider (S1–S7), plans/actions/undo, insights, briefing
 
 ## Known issues
 - none

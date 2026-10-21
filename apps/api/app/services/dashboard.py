@@ -143,7 +143,7 @@ async def today(ctx: Ctx) -> TodayOut:
         (
             await ctx.session.scalars(
                 scoped(Task, ctx.workspace_id)
-                .where(Task.done.is_(False), Task.due_at < start)
+                .where(Task.done.is_(False), Task.due_at < start, Task.assignee_id == ctx.user_id)
                 .order_by(Task.due_at)
                 .limit(20)
             )
@@ -153,7 +153,12 @@ async def today(ctx: Ctx) -> TodayOut:
         (
             await ctx.session.scalars(
                 scoped(Task, ctx.workspace_id)
-                .where(Task.done.is_(False), Task.due_at >= start, Task.due_at < end)
+                .where(
+                    Task.done.is_(False),
+                    Task.due_at >= start,
+                    Task.due_at < end,
+                    Task.assignee_id == ctx.user_id,
+                )
                 .order_by(Task.due_at)
                 .limit(20)
             )
