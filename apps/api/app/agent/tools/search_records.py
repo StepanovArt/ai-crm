@@ -1,4 +1,5 @@
 import uuid
+from collections.abc import Mapping
 from decimal import Decimal
 from typing import Literal
 
@@ -44,10 +45,11 @@ class SearchRecordsTool(Tool[SearchArgs]):
     description = "Find companies, contacts, deals or tasks with filters (stage, owner, value, staleness, score)."
     Args = SearchArgs
 
-    def describe(self, args: SearchArgs) -> str:
-        noun = {"company": "companies", "contact": "contacts", "deal": "deals", "task": "tasks"}[
+    def describe(self, args: SearchArgs, terms: Mapping[str, str] | None = None) -> str:
+        plural = {"company": "companies", "contact": "contacts", "deal": "deals", "task": "tasks"}[
             args.object_type
         ]
+        noun = (terms or {}).get(plural, plural).lower()
         if args.stale_days:
             return f"Finding {noun} quiet for {args.stale_days}+ days"
         if args.score_min:

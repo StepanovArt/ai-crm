@@ -2,6 +2,7 @@
 
 import uuid
 from abc import ABC, abstractmethod
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Any, ClassVar
 
@@ -36,8 +37,11 @@ class Tool[A: BaseModel](ABC):
     def parse(self, raw: dict[str, Any]) -> A:
         return self.Args.model_validate(raw)
 
-    def describe(self, args: A) -> str:
-        """Human label for the tool chip (e.g. "Moving Acme to Negotiation")."""
+    def describe(self, args: A, terms: Mapping[str, str] | None = None) -> str:
+        """Human label for the tool chip (e.g. "Moving Acme to Negotiation").
+
+        `terms` is the workspace vocabulary ({"deals": "Opportunities", …}).
+        """
         return self.label
 
     @abstractmethod

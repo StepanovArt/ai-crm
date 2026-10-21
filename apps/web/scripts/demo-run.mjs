@@ -84,8 +84,8 @@ step(4, `deal moved, Bergmann cards in Negotiation column: ${moved}`);
 
 // 5. Contact → insight → draft email → save as note.
 await page.goto(`${WEB}/contacts?sort=-score`);
-await page.locator("tbody tr[data-agent-id]").first().locator("a").first().click();
-await page.waitForURL("**/records/contact/**");
+const rowId = await page.locator("tbody tr[data-agent-id]").first().getAttribute("data-agent-id");
+await page.goto(`${WEB}/records/contact/${rowId.split("-").slice(2).join("-")}`);
 await page.getByRole("button", { name: "Draft email" }).click();
 await page.getByRole("button", { name: "Save as note" }).waitFor({ timeout: 30000 });
 await page.getByRole("button", { name: "Save as note" }).click();
@@ -101,12 +101,13 @@ await shot("6-chart");
 step(6, "pipeline chart card");
 
 // 7. Settings → add a custom field → appears in the table.
-await page.goto(`${WEB}/settings`);
+await page.goto(`${WEB}/settings?tab=fields`);
 await page.getByRole("button", { name: "Add field" }).click();
-await page.getByLabel("Label").fill("Plant manager");
-await page.getByRole("button", { name: /^(Add|Create|Save)( field)?$/ }).last().click();
-await page.waitForTimeout(800);
-await page.goto(`${WEB}/deals`);
+const dialog = page.getByRole("dialog");
+await dialog.getByLabel("Name").fill("Plant manager");
+await dialog.getByRole("button", { name: "Add field" }).click();
+await page.getByText("Plant manager").first().waitFor();
+await page.locator('[data-agent-id="nav-deals"]').click();
 await page.getByRole("columnheader", { name: "Plant manager" }).waitFor({ timeout: 15000 });
 await shot("7-field");
 step(7, "custom field visible in table");

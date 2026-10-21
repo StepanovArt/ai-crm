@@ -1,4 +1,5 @@
 import uuid
+from collections.abc import Mapping
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field
@@ -33,7 +34,7 @@ class UpdateRecordTool(Tool[UpdateRecordArgs]):
     mutating = True
     Args = UpdateRecordArgs
 
-    def describe(self, args: UpdateRecordArgs) -> str:
+    def describe(self, args: UpdateRecordArgs, terms: Mapping[str, str] | None = None) -> str:
         return f"Updating {', '.join(args.fields)}"
 
     async def run(self, tctx: ToolContext, args: UpdateRecordArgs) -> ToolResult:

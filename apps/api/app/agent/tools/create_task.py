@@ -1,4 +1,5 @@
 import uuid
+from collections.abc import Mapping
 from datetime import datetime
 from typing import Any, Literal
 
@@ -32,7 +33,7 @@ class CreateTaskTool(Tool[CreateTaskArgs]):
     mutating = True
     Args = CreateTaskArgs
 
-    def describe(self, args: CreateTaskArgs) -> str:
+    def describe(self, args: CreateTaskArgs, terms: Mapping[str, str] | None = None) -> str:
         if len(args.tasks) == 1:
             return f"Creating task “{args.tasks[0].title}”"
         return f"Creating {len(args.tasks)} tasks"

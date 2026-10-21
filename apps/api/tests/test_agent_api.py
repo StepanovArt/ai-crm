@@ -158,3 +158,15 @@ async def test_unknown_custom_field_fails_cleanly(session: AsyncSession) -> None
         assert "warp" in exc.message
     else:
         raise AssertionError("expected ValidationFailed")
+
+
+def test_tool_labels_use_workspace_vocabulary() -> None:
+    tool = default_registry().get("search_records")
+    stale = tool.parse({"object_type": "deal", "stale_days": 7})
+    assert tool.describe(stale) == "Finding deals quiet for 7+ days"
+    assert (
+        tool.describe(stale, {"deals": "Opportunities"})
+        == "Finding opportunities quiet for 7+ days"
+    )
+    query = tool.parse({"object_type": "company", "query": "Bergmann"})
+    assert tool.describe(query, {"companies": "Customers"}) == "Searching customers for “Bergmann”"

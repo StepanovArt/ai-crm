@@ -233,7 +233,7 @@ class Orchestrator:
                     tool = self.registry.get(step.tool)
                     try:
                         args = tool.parse(step.args)
-                        label = step.label or tool.describe(args)
+                        label = step.label or tool.describe(args, user.terminology)
                     except ValidationError as exc:
                         yield emit(
                             ToolCallEvent(
