@@ -71,7 +71,7 @@ export function StageColumn({
               <span>weighted</span>
             </>
           )}
-          <span className="ml-auto pr-1 opacity-60">{column.stage.probability}%</span>
+          <span className="ml-auto pr-1">{column.stage.probability}%</span>
         </div>
       </header>
       <div

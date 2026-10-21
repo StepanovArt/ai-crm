@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover";
@@ -48,8 +50,10 @@ export function EditableField({
       options={options}
       recordId={recordId}
       currency={currency}
+      plain={editable}
     />
   );
+  const link = editable ? linkFor(type, value) : null;
   if (!editable) return <div className={cn("flex min-w-0 items-center", className)}>{display}</div>;
 
   if (type === "checkbox") {
@@ -74,7 +78,7 @@ export function EditableField({
   // of idle Popper instances. It anchors to the cell through a virtual ref, so the cell
   // element itself never remounts.
   return (
-    <>
+    <div className={cn("group/field flex min-w-0 items-center gap-0.5", link && className)}>
       <div
         ref={anchorRef}
         role="button"
@@ -100,6 +104,7 @@ export function EditableField({
       >
         {display}
       </div>
+      {link && <OpenLink link={link} label={label} />}
       {open && (
         <Popover open onOpenChange={setOpen}>
           <PopoverAnchor virtualRef={anchorRef as React.RefObject<HTMLDivElement>} />
@@ -130,6 +135,51 @@ export function EditableField({
           </PopoverContent>
         </Popover>
       )}
-    </>
+    </div>
+  );
+}
+
+type FieldLink = { href: string; external: boolean };
+
+/** Where a link-like value points, so the editor trigger and the link can be siblings. */
+function linkFor(type: DescriptorType, value: unknown): FieldLink | null {
+  if (value === null || value === undefined || value === "") return null;
+  if (type === "email") return { href: `mailto:${String(value)}`, external: true };
+  if (type === "url") {
+    const raw = String(value);
+    return { href: raw.startsWith("http") ? raw : `https://${raw}`, external: true };
+  }
+  const id = (value as { id?: string }).id;
+  if (type === "company_link" && id) return { href: `/records/company/${id}`, external: false };
+  if (type === "contact_link" && id) return { href: `/records/contact/${id}`, external: false };
+  return null;
+}
+
+function OpenLink({ link, label }: { link: FieldLink; label: string }) {
+  const className =
+    "flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-opacity outline-none group-hover/field:opacity-100 hover:bg-accent hover:text-foreground focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring/40";
+  const icon = <ArrowUpRight className="size-3.5" />;
+  if (link.external)
+    return (
+      <a
+        href={link.href}
+        target={link.href.startsWith("mailto:") ? undefined : "_blank"}
+        rel="noreferrer"
+        aria-label={`Open ${label}`}
+        onClick={(e) => e.stopPropagation()}
+        className={className}
+      >
+        {icon}
+      </a>
+    );
+  return (
+    <Link
+      href={link.href}
+      aria-label={`Open ${label}`}
+      onClick={(e) => e.stopPropagation()}
+      className={className}
+    >
+      {icon}
+    </Link>
   );
 }

@@ -24,6 +24,7 @@ export function FieldRenderer({
   recordId,
   currency = "USD",
   className,
+  plain = false,
 }: {
   type: DescriptorType;
   value: unknown;
@@ -31,6 +32,8 @@ export function FieldRenderer({
   recordId?: string;
   currency?: string;
   className?: string;
+  /** Render links as text (inside another interactive element, e.g. an inline editor). */
+  plain?: boolean;
 }) {
   const { byId } = useMembers();
   if (
@@ -88,6 +91,10 @@ export function FieldRenderer({
       );
     }
     case "email":
+      if (plain)
+        return (
+          <span className={cn("truncate text-foreground/90", className)}>{String(value)}</span>
+        );
       return (
         <a
           href={`mailto:${value as string}`}
@@ -102,6 +109,8 @@ export function FieldRenderer({
       const label = String(value)
         .replace(/^https?:\/\/(www\.)?/, "")
         .replace(/\/$/, "");
+      if (plain)
+        return <span className={cn("truncate text-foreground/90", className)}>{label}</span>;
       return (
         <a
           href={href}
@@ -138,6 +147,13 @@ export function FieldRenderer({
     case "company_link": {
       const c = value as Brief;
       if (!c) return <Empty />;
+      if (plain)
+        return (
+          <span className={cn("flex min-w-0 items-center gap-1.5", className)}>
+            <CompanyLogo name={c.name} size="xs" />
+            <span className="truncate">{c.name}</span>
+          </span>
+        );
       return (
         <Link
           href={`/records/company/${c.id}`}
@@ -152,6 +168,13 @@ export function FieldRenderer({
     case "contact_link": {
       const c = value as Brief;
       if (!c) return <Empty />;
+      if (plain)
+        return (
+          <span className={cn("flex min-w-0 items-center gap-1.5", className)}>
+            <Avatar name={c.full_name} size="xs" />
+            <span className="truncate">{c.full_name}</span>
+          </span>
+        );
       return (
         <Link
           href={`/records/contact/${c.id}`}

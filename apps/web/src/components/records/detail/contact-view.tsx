@@ -47,7 +47,7 @@ export function ContactView({ contact, insight }: { contact: Contact; insight?: 
                 {contact.title && <span>{contact.title}</span>}
                 {contact.company && (
                   <>
-                    <span className="opacity-60">at</span>
+                    <span>at</span>
                     <Link
                       href={`/records/company/${contact.company.id}`}
                       className="font-medium text-foreground/80 hover:underline"

@@ -22,6 +22,8 @@ import { FieldDialog } from "./field-dialog";
 import { fieldTypeMeta } from "./field-type-meta";
 import { SortableList } from "./sortable-list";
 
+const OPTION_PREVIEW = 3;
+
 export function FieldsSettings() {
   const t = useTerms();
   const [objectType, setObjectType] = React.useState<ObjectType>("deal");
@@ -92,12 +94,14 @@ export function FieldsSettings() {
                       {meta.label} · <span className="font-mono">{f.key}</span>
                     </p>
                   </div>
-                  <div className="hidden max-w-xs flex-wrap justify-end gap-1 md:flex">
-                    {f.options.slice(0, 4).map((o) => (
+                  <div className="hidden max-w-sm min-w-0 items-center justify-end gap-1 overflow-hidden md:flex">
+                    {f.options.slice(0, OPTION_PREVIEW).map((o) => (
                       <StatusBadge key={o.value} label={o.label} color={o.color} />
                     ))}
-                    {f.options.length > 4 && (
-                      <span className="text-xs text-muted-foreground">+{f.options.length - 4}</span>
+                    {f.options.length > OPTION_PREVIEW && (
+                      <span className="shrink-0 text-xs text-muted-foreground">
+                        +{f.options.length - OPTION_PREVIEW}
+                      </span>
                     )}
                   </div>
                   <Button

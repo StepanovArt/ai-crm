@@ -31,7 +31,7 @@ function DueChip({ due, done }: { due: string | null; done: boolean }) {
         done
           ? "text-muted-foreground"
           : diff < 0
-            ? "font-medium text-rose-600 dark:text-rose-400"
+            ? "font-medium text-rose-700 dark:text-rose-400"
             : diff === 0
               ? "font-medium text-amber-700 dark:text-amber-400"
               : "text-muted-foreground",

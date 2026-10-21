@@ -268,6 +268,12 @@ async def contact_insight(ctx: Ctx, contact_id: uuid.UUID) -> Insight:
     )
 
 
+def _stage_age(days: int) -> str:
+    if days <= 0:
+        return "since today"
+    return f"for {plural(days, 'day')}"
+
+
 async def deal_insight(ctx: Ctx, deal_id: uuid.UUID) -> Insight:
     deal = await deals_service.get_deal(ctx, deal_id)
     activities = await list_timeline(ctx, "deal", deal_id, limit=60)
@@ -284,12 +290,12 @@ async def deal_insight(ctx: Ctx, deal_id: uuid.UUID) -> Insight:
 
     bullets = [
         f"Stage: {stage.name if stage else '—'} ({stage.probability if stage else 0}%)"
-        + (f" for {in_stage} days" if in_stage is not None else ""),
+        + (f" {_stage_age(in_stage)}" if in_stage is not None else ""),
         f"Value: {money(deal.value, deal.currency)} · weighted {money(weighted, deal.currency)}",
     ]
     if eng.last is not None:
         bullets.append(f"Last touch: {_describe(eng.last)}")
-    if deal.expected_close:
+    if deal.expected_close and kind == "open":
         days_to_close = (deal.expected_close - utcnow().date()).days
         when = (
             f"{-days_to_close} days overdue"
@@ -312,7 +318,7 @@ async def deal_insight(ctx: Ctx, deal_id: uuid.UUID) -> Insight:
         headline, tone = f"Closing soon — expected {fmt_day(deal.expected_close)}", "positive"
     else:
         headline, tone = (
-            f"On track — in {stage.name if stage else 'pipeline'} for {in_stage or 0} days",
+            f"On track — in {stage.name if stage else 'pipeline'} {_stage_age(in_stage or 0)}",
             "positive",
         )
 

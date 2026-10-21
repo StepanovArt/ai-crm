@@ -121,9 +121,7 @@ function Body({ a, noteBodies }: { a: Activity; noteBodies: Map<string, string> 
       return p.summary ? (
         <p className="mt-1 text-[13px] text-muted-foreground">
           {str(p.summary)}
-          {p.duration_min ? (
-            <span className="ml-1 opacity-70">· {str(p.duration_min)} min</span>
-          ) : null}
+          {p.duration_min ? <span className="ml-1">· {str(p.duration_min)} min</span> : null}
         </p>
       ) : null;
     case "meeting":
@@ -162,7 +160,7 @@ function Body({ a, noteBodies }: { a: Activity; noteBodies: Map<string, string> 
           {changes.slice(0, 4).map((c) => (
             <li key={c.label}>
               <span className="text-foreground/80">{c.label}</span>:{" "}
-              <span className="line-through opacity-60">{fmtChange(c.from)}</span> →{" "}
+              <span className="text-muted-foreground line-through">{fmtChange(c.from)}</span> →{" "}
               <span className="text-foreground/90">{fmtChange(c.to)}</span>
             </li>
           ))}

@@ -74,16 +74,12 @@ function CommandGroup({
   );
 }
 
-function CommandSeparator({
-  className,
-  ...props
-}: React.ComponentProps<typeof CommandPrimitive.Separator>) {
-  return (
-    <CommandPrimitive.Separator
-      className={cn("-mx-1.5 my-1 h-px bg-border", className)}
-      {...props}
-    />
-  );
+/**
+ * Decorative divider. cmdk's own Separator has role="separator", which isn't a valid child of
+ * the listbox; this one is hidden from assistive tech (group headings already separate items).
+ */
+function CommandSeparator({ className, ...props }: React.ComponentProps<"div">) {
+  return <div aria-hidden className={cn("-mx-1.5 my-1 h-px bg-border", className)} {...props} />;
 }
 
 function CommandItem({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.Item>) {

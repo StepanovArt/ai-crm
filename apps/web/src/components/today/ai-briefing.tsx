@@ -26,7 +26,7 @@ const ICONS = {
   company: Building2,
 } as const;
 const TONES = {
-  danger: "text-rose-600 dark:text-rose-300",
+  danger: "text-rose-700 dark:text-rose-300",
   warning: "text-amber-700 dark:text-amber-300",
   positive: "text-emerald-700 dark:text-emerald-300",
   neutral: "text-muted-foreground",

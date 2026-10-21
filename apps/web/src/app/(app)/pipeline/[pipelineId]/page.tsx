@@ -77,8 +77,10 @@ function PipelineBoard({ pipelineId }: { pipelineId: string }) {
         <div>
           <h1 className="text-xl font-semibold tracking-tight">{pipeline?.name ?? t.pipeline}</h1>
           <p className="mt-1 flex items-center gap-1.5 text-[13px] text-muted-foreground">
-            <span className="tabular">{openCount}</span> open{" "}
-            {openCount === 1 ? t.deal.toLowerCase() : t.deals.toLowerCase()}
+            <span>
+              <span className="tabular">{openCount}</span> open{" "}
+              {openCount === 1 ? t.deal.toLowerCase() : t.deals.toLowerCase()}
+            </span>
             <span className="opacity-40">·</span>
             <MoneyText
               value={openValue}
@@ -86,7 +88,9 @@ function PipelineBoard({ pipelineId }: { pipelineId: string }) {
               className="font-medium text-foreground"
             />
             <span className="opacity-40">·</span>
-            <MoneyText value={weighted} currency={currency} /> weighted
+            <span>
+              <MoneyText value={weighted} currency={currency} /> weighted
+            </span>
           </p>
         </div>
         <div className="flex items-center gap-2">

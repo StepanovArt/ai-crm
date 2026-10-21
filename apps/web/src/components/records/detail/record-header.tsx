@@ -44,7 +44,12 @@ export function RecordHeader({
         {icon}
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="truncate text-2xl font-semibold tracking-tight">{title}</h1>
+            <h1
+              className="line-clamp-2 text-2xl font-semibold tracking-tight break-words"
+              title={typeof title === "string" ? title : undefined}
+            >
+              {title}
+            </h1>
             {badges}
           </div>
           {subtitle && (
