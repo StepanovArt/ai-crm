@@ -81,6 +81,7 @@ Phase 9 — Polish & demo readiness
 - [x] `POST /onboarding/generate` (SSE), `POST /onboarding/demo` (skip → instant build), `GET /onboarding/templates`; 409 once onboarded; row lock against concurrent runs; teammates get per-workspace emails and unusable passwords
 - [x] `/onboarding`: one-sentence prompt + 5 example chips + "Skip, use demo workspace"; split screen with steps checking off and a live app skeleton (sidebar relabels to the new vocabulary with counts, kanban columns drop in one by one, sample deals and custom fields fill in) → Today
 - [x] Tests: template matching + completeness, real-estate DoD (stages, fields, terminology, 30/60/25 records, hot leads, tasks), skip path, two workspaces don't collide (114 API tests); reducer unit tests; Playwright signup → apartments → Today/pipeline and skip path
+- [x] Optional: `LLM_PROVIDER=openai` — OpenAI-compatible provider (streaming function calling; mutations only via approved plans; same cards and undo), tested with a fake server
 - Screens: `docs/screens/phase-8/`
 
 ## Next
