@@ -73,7 +73,7 @@ class Deal(WorkspaceScopedMixin, Base):
         UUID(as_uuid=True), ForeignKey("pipelines.id", ondelete="CASCADE"), index=True
     )
     stage_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("stages.id", ondelete="RESTRICT"), index=True
+        UUID(as_uuid=True), ForeignKey("stages.id"), index=True
     )
     name: Mapped[str] = mapped_column(String(200))
     value: Mapped[Decimal] = mapped_column(Numeric(14, 2), default=Decimal("0"))

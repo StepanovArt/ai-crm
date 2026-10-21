@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     env: Literal["dev", "test", "prod"] = "dev"
     database_url: str = "postgresql+asyncpg://halo:halo@localhost:5432/halo"
     test_database_url: str = "postgresql+asyncpg://halo:halo@localhost:5432/halo_test"
-    jwt_secret: str = "change-me-in-production"
+    jwt_secret: str = "dev-only-secret-change-me-in-production-0123456789"
     jwt_algorithm: str = "HS256"
     jwt_expire_minutes: int = 60 * 24 * 14
     cookie_name: str = "halo_session"

@@ -4,7 +4,7 @@ from fastapi.routing import APIRoute
 
 from app.config import get_settings
 from app.errors import install_error_handlers
-from app.routers import health
+from app.routers import auth, demo, health, workspaces
 
 API_PREFIX = "/api/v1"
 
@@ -28,7 +28,8 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
     install_error_handlers(app)
-    app.include_router(health.router, prefix=API_PREFIX)
+    for module in (health, auth, workspaces, demo):
+        app.include_router(module.router, prefix=API_PREFIX)
     return app
 
 
