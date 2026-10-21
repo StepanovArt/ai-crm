@@ -4,7 +4,7 @@ import * as React from "react";
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { LucideIcon } from "lucide-react";
 import { Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 import { ConfirmDialog } from "@/components/common/confirm-dialog";
@@ -68,6 +68,10 @@ export function RecordTablePage<T extends RecordType>({
   const selectedIds = Object.keys(state.selection).filter((k) => state.selection[k]);
 
   useKeySequences(React.useMemo(() => ({ c: () => setCreateOpen(true) }), []));
+  const params = useSearchParams();
+  React.useEffect(() => {
+    if (params.get("create") === "1") setCreateOpen(true);
+  }, [params]);
 
   const onUpdate = React.useCallback(
     (row: RecordOf<T>, d: FieldDescriptor<T>, value: unknown) => {
@@ -129,7 +133,7 @@ export function RecordTablePage<T extends RecordType>({
           </Kbd>
         </Button>
       </div>
-      <div className="flex flex-wrap items-center gap-2 border-b px-6 pb-3">
+      <div className="@container flex flex-wrap items-center gap-2 border-b px-6 pb-3">
         <ViewTabs views={state.views} active={state.view.key} onChange={state.setView} />
         <div className="flex-1" />
         <FilterChips

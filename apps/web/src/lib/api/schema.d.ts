@@ -686,6 +686,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/agent/cards/schema": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Cards Schema
+         * @description Exposes card payload types in OpenAPI for the web client.
+         */
+        get: operations["cards_schema"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/agent/events/schema": {
         parameters: {
             query?: never;
@@ -843,6 +863,55 @@ export interface components {
             data: {
                 [key: string]: unknown;
             };
+        };
+        /** CardSchemas */
+        CardSchemas: {
+            records: components["schemas"]["RecordsCard"];
+            chart: components["schemas"]["ChartCard"];
+            email_draft: components["schemas"]["EmailDraft"];
+            next_step: components["schemas"]["NextStep"];
+        };
+        /** ChartCard */
+        ChartCard: {
+            /** Title */
+            title: string;
+            /** Currency */
+            currency: string;
+            /** Series */
+            series: components["schemas"]["ChartSeriesItem"][];
+            totals: components["schemas"]["ChartTotals"];
+        };
+        /** ChartSeriesItem */
+        ChartSeriesItem: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Color */
+            color: string;
+            /** Kind */
+            kind: string;
+            /** Count */
+            count: number;
+            /** Value */
+            value: string;
+            /** Weighted */
+            weighted: string;
+        };
+        /** ChartTotals */
+        ChartTotals: {
+            /** Open Value */
+            open_value: string;
+            /** Weighted Value */
+            weighted_value: string;
+            /** Won This Month Value */
+            won_this_month_value: string;
+            /** Won This Month Count */
+            won_this_month_count: number;
+            /** Open Count */
+            open_count: number;
+            /** Stale Count */
+            stale_count: number;
         };
         /** ChatIn */
         ChatIn: {
@@ -1239,6 +1308,31 @@ export interface components {
             custom?: {
                 [key: string]: unknown;
             } | null;
+        };
+        /** EmailDraft */
+        EmailDraft: {
+            /** To */
+            to: string | null;
+            /** To Name */
+            to_name: string;
+            /** Subject */
+            subject: string;
+            /** Body */
+            body: string;
+            /**
+             * Contact Id
+             * Format: uuid
+             */
+            contact_id: string;
+            /** Related Type */
+            related_type: string;
+            /**
+             * Related Id
+             * Format: uuid
+             */
+            related_id: string;
+            /** Context Note */
+            context_note: string;
         };
         /** ErrorEvent */
         ErrorEvent: {
@@ -1760,6 +1854,37 @@ export interface components {
             /** Reasons */
             reasons: components["schemas"]["ScoreSignalOut"][];
             open_deal: components["schemas"]["DealOut"] | null;
+        };
+        /** RecordItem */
+        RecordItem: {
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "task" | "contact" | "deal" | "company";
+            /** Id */
+            id: string;
+            /** Title */
+            title: string;
+            /** Subtitle */
+            subtitle?: string | null;
+            /** Badge */
+            badge?: string | null;
+            /**
+             * Tone
+             * @default neutral
+             * @enum {string}
+             */
+            tone?: "danger" | "warning" | "positive" | "neutral";
+            /** Href */
+            href: string;
+        };
+        /** RecordsCard */
+        RecordsCard: {
+            /** Title */
+            title: string;
+            /** Items */
+            items: components["schemas"]["RecordItem"][];
         };
         /** RelatedBrief */
         RelatedBrief: {
@@ -4057,6 +4182,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cards_schema: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CardSchemas"] | null;
                 };
             };
         };

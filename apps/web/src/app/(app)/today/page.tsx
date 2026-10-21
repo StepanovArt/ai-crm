@@ -6,7 +6,7 @@ import { ListChecks } from "lucide-react";
 
 import { EmptyState } from "@/components/common/empty-state";
 import { TaskRow } from "@/components/tasks/task-row";
-import { BriefingSlot } from "@/components/today/briefing-slot";
+import { AIBriefing } from "@/components/today/ai-briefing";
 import { ContactQueue } from "@/components/today/contact-queue";
 import { StageBars } from "@/components/today/stage-bars";
 import { StaleDeals } from "@/components/today/stale-deals";
@@ -46,7 +46,7 @@ export default function TodayPage() {
   const tasks = [...(data?.tasks_overdue ?? []), ...(data?.tasks_today ?? [])];
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-7">
+    <div className="@container mx-auto max-w-6xl px-6 py-7">
       <header className="mb-6">
         <p className="text-[13px] text-muted-foreground">
           {now?.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" }) ??
@@ -60,9 +60,9 @@ export default function TodayPage() {
         <TodaySkeleton />
       ) : (
         <div className="space-y-6">
-          <BriefingSlot />
+          <AIBriefing />
           <StatTiles stats={data.stats} dealsLabel={t.deals} />
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+          <div className="grid gap-6 @4xl:grid-cols-[minmax(0,1fr)_320px]">
             <Card className="overflow-hidden" data-agent-id="today-queue">
               <CardHeader className="border-b pb-3">
                 <div>
@@ -107,7 +107,7 @@ export default function TodayPage() {
               </CardContent>
             </Card>
           </div>
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <div className="grid gap-6 @3xl:grid-cols-2">
             <Card data-agent-id="today-pipeline">
               <CardHeader>
                 <div>

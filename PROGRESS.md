@@ -1,7 +1,7 @@
 # Progress
 
 ## Current phase
-Phase 7 — Agent frontend
+Phase 8 — Onboarding & universality
 
 ## Phase 0 — Scaffold ✅
 - [x] Monorepo layout, docker-compose (Postgres 16), `.env.example`, Makefile
@@ -65,8 +65,18 @@ Phase 7 — Agent frontend
 - [x] Deterministic insights (summary, bullets, next step) and email drafts from real timeline data
 - [x] Tests: each scenario's event sequence + DB effects; S2/S3 undo restores tasks/activities/deals/scores exactly; mutation guard; isolation; insights/briefing (98 API tests total)
 
+## Phase 7 — Agent frontend ✅
+- [x] `lib/agent/types.ts` (aliases of generated OpenAPI schemas incl. card payloads), fetch+ReadableStream SSE client with abort/early retry, pure event reducer (unit-tested), zustand agent store (send/approve/reject/undo/stop/history)
+- [x] AgentPanel (⌘J, resizable, pushes content on wide screens, overlays < 1100px), thinking shimmer, ToolChips (spinner → check), PlanCard (approve/reject + status), cards (records, chart, email draft with Copy/Save as note, next step with one-click Create task), Undo, page-aware suggested prompts, conversation history
+- [x] Sequential ui_action executor (navigate, highlight with live-tracked ring, pulse, move_card via board cache + motion layout, apply_filter via URL, invalidate, toast) + AgentCursor overlay (springs, respects reduced motion)
+- [x] ⌘K CommandBar: Ask AI, suggested prompts, record search, navigation, create actions, theme
+- [x] InlineInsight on record pages; streamed AI briefing on Today; agent badges on agent-touched deals/tasks/activities
+- [x] Streaming-safe markdown (no flashing asterisks), container-query layouts so pages stay tidy with the panel open
+- [x] Playwright: S2 plan → approve → tasks → undo; S3 card moves columns → undo; ⌘K Ask AI chart; insight → draft → save note
+- Screens: `docs/screens/phase-7/`
+
 ## Next
-- Phase 7: SSE client + agent store, AgentPanel, PlanCard, ToolCallChip, cards, ui_action executor + AgentCursor, ⌘K CommandBar, InlineInsight, streamed briefing, agent badges
+- Phase 8: 5 industry templates, streaming onboarding generator, split-screen onboarding with live skeleton, demo-workspace path
 
 ## Known issues
 - none

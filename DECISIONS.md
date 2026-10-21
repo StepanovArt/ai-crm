@@ -39,3 +39,9 @@ One line per decision: what and why.
 - 2026-10-21 — `search_records` also searches tasks (`object_type: task`, buckets, `mine`) because S1 needs tasks and the Section 6.4 tool list has no task reader; contact results include top score reasons.
 - 2026-10-21 — The briefing exists as JSON (`GET /agent/briefing`) and as an unsaved SSE stream (`GET /agent/briefing/stream`) that runs the S1 scenario without creating a conversation; Today uses the stream.
 - 2026-10-21 — Mock "intelligence" (insights, next steps, drafts) is rule-based over real data in `agent/insights.py` / `agent/drafting.py`; it is shared by tools, `/agent/insights` and scenarios.
+- 2026-10-21 — Card payloads have Pydantic models (`agent/cards.py`) exposed via `GET /agent/cards/schema`, so the web renders cards from generated types instead of hand-written ones.
+- 2026-10-21 — The SSE client retries only when the connection fails before the first event (safe to resend); mid-stream drops surface as an error event.
+- 2026-10-21 — The executor uses its own reveal-scrolling (vertical centring; horizontal only when the target fits) instead of `scrollIntoView`, which over-scrolled wide tables and the kanban; highlight rings are clipped to `#main` so they never spill under the panel.
+- 2026-10-21 — `move_card` is applied to the cached board (same `applyMove` as drag & drop) so motion's `layoutId` animates the card between columns; the server refetch that follows confirms the persisted position.
+- 2026-10-21 — "Save as note" and "Create task" on agent cards are direct user actions (REST), not agent mutations, so they don't need a plan; agent-proposed changes always go through plans.
+- 2026-10-21 — Pages that sit beside the agent panel (Today, record detail, table toolbars) use container queries rather than viewport breakpoints.

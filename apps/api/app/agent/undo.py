@@ -18,6 +18,7 @@ INVALIDATE: list[list[str]] = [
     ["dashboard"],
     ["contacts"],
     ["companies"],
+    ["agent", "insights"],
     ["notes"],
 ]
 

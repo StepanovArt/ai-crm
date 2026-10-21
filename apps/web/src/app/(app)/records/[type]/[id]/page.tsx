@@ -3,6 +3,7 @@
 import { use } from "react";
 import { notFound } from "next/navigation";
 
+import { InlineInsight } from "@/components/agent/inline-insight";
 import { EmptyState } from "@/components/common/empty-state";
 import { CompanyView } from "@/components/records/detail/company-view";
 import { ContactView } from "@/components/records/detail/contact-view";
@@ -20,19 +21,31 @@ function Missing() {
 function CompanyPage({ id }: { id: string }) {
   const { data, isLoading } = useCompany(id);
   if (isLoading) return <RecordSkeleton />;
-  return data ? <CompanyView company={data} /> : <Missing />;
+  return data ? (
+    <CompanyView company={data} insight={<InlineInsight type="company" id={id} />} />
+  ) : (
+    <Missing />
+  );
 }
 
 function ContactPage({ id }: { id: string }) {
   const { data, isLoading } = useContact(id);
   if (isLoading) return <RecordSkeleton />;
-  return data ? <ContactView contact={data} /> : <Missing />;
+  return data ? (
+    <ContactView contact={data} insight={<InlineInsight type="contact" id={id} />} />
+  ) : (
+    <Missing />
+  );
 }
 
 function DealPage({ id }: { id: string }) {
   const { data, isLoading } = useDeal(id);
   if (isLoading) return <RecordSkeleton />;
-  return data ? <DealView deal={data} /> : <Missing />;
+  return data ? (
+    <DealView deal={data} insight={<InlineInsight type="deal" id={id} />} />
+  ) : (
+    <Missing />
+  );
 }
 
 export default function RecordPage({ params }: { params: Promise<{ type: string; id: string }> }) {

@@ -3,6 +3,10 @@
 import * as React from "react";
 import { usePathname, useRouter } from "next/navigation";
 
+import { AgentCursor } from "@/components/agent/agent-cursor";
+import { CommandBar } from "@/components/agent/command-bar";
+import { AgentPanel } from "@/components/agent/agent-panel";
+import { AgentRuntime } from "@/components/agent/agent-runtime";
 import { useMe } from "@/hooks/use-auth";
 import { useKeySequences, useModKey } from "@/hooks/use-hotkeys";
 import { ApiError } from "@/lib/api/client";
@@ -35,15 +39,7 @@ function useGlobalShortcuts() {
   useKeySequences(bindings);
 }
 
-export function AppShell({
-  children,
-  overlays,
-  panel,
-}: {
-  children: React.ReactNode;
-  overlays?: React.ReactNode;
-  panel?: React.ReactNode;
-}) {
+export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { data: me, error, isLoading } = useMe();
@@ -70,8 +66,14 @@ export function AppShell({
           {children}
         </main>
       </div>
-      {panel}
-      {overlays}
+      <React.Suspense>
+        <AgentPanel />
+      </React.Suspense>
+      <AgentCursor />
+      <React.Suspense>
+        <AgentRuntime />
+        <CommandBar />
+      </React.Suspense>
     </div>
   );
 }

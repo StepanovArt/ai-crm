@@ -84,7 +84,7 @@ export function SearchBox({
         onChange={(e) => setDraft(e.target.value)}
         placeholder={placeholder}
         aria-label={placeholder}
-        className="h-7 w-56 pl-8 text-[13px]"
+        className="h-7 w-40 pl-8 text-[13px] @4xl:w-56"
       />
     </div>
   );

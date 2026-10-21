@@ -8,6 +8,7 @@ from sqlalchemy import select
 from sse_starlette import EventSourceResponse
 
 from app.agent.briefing import Briefing, compose_briefing
+from app.agent.cards import CardSchemas
 from app.agent.context import PageContext
 from app.agent.events import AgentEvent, AnyEvent
 from app.agent.insights import Insight, build_insight
@@ -238,6 +239,12 @@ async def briefing_stream(
             outcome = yield step
 
     return _sse(orch.stream_unsaved(user, run(), page))
+
+
+@router.get("/cards/schema", response_model=CardSchemas | None)
+async def cards_schema() -> CardSchemas | None:
+    """Exposes card payload types in OpenAPI for the web client."""
+    return None
 
 
 @router.get("/events/schema", response_model=list[AgentEvent], include_in_schema=True)

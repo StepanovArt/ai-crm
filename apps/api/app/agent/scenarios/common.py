@@ -13,6 +13,7 @@ INVALIDATE_ALL: list[list[str]] = [
     ["dashboard"],
     ["contacts"],
     ["companies"],
+    ["agent", "insights"],
 ]
 
 

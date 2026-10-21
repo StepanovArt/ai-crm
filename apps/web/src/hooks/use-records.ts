@@ -21,27 +21,30 @@ function listQuery(args: ListArgs) {
   };
 }
 
-export function useCompanies(args: ListArgs) {
+export function useCompanies(args: ListArgs, opts: { enabled?: boolean } = {}) {
   return useQuery({
     queryKey: qk.companies.list(args),
     queryFn: () => unwrap(api.GET("/api/v1/companies", { params: { query: listQuery(args) } })),
     placeholderData: keepPreviousData,
+    enabled: opts.enabled ?? true,
   });
 }
 
-export function useContacts(args: ListArgs) {
+export function useContacts(args: ListArgs, opts: { enabled?: boolean } = {}) {
   return useQuery({
     queryKey: qk.contacts.list(args),
     queryFn: () => unwrap(api.GET("/api/v1/contacts", { params: { query: listQuery(args) } })),
     placeholderData: keepPreviousData,
+    enabled: opts.enabled ?? true,
   });
 }
 
-export function useDeals(args: ListArgs) {
+export function useDeals(args: ListArgs, opts: { enabled?: boolean } = {}) {
   return useQuery({
     queryKey: qk.deals.list(args),
     queryFn: () => unwrap(api.GET("/api/v1/deals", { params: { query: listQuery(args) } })),
     placeholderData: keepPreviousData,
+    enabled: opts.enabled ?? true,
   });
 }
 

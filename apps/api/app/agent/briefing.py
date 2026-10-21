@@ -145,4 +145,9 @@ def compose_briefing(
 
 
 def briefing_card(b: Briefing) -> dict[str, Any]:
-    return {"title": "Start here", "items": [i.model_dump(mode="json") for i in b.items]}
+    from app.agent.cards import RecordItem, RecordsCard
+
+    card = RecordsCard(
+        title="Start here", items=[RecordItem.model_validate(i.model_dump()) for i in b.items]
+    )
+    return card.model_dump(mode="json")

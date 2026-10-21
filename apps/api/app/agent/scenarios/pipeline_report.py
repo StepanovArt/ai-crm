@@ -2,6 +2,7 @@
 
 from typing import Any
 
+from app.agent.cards import ChartCard, ChartSeriesItem, ChartTotals
 from app.agent.providers.base import SuggestionsStep, ToolCallStep
 from app.agent.scenarios.common import ScenarioGen, need
 from app.agent.scenarios.kit import Kit
@@ -53,36 +54,13 @@ async def run(kit: Kit) -> ScenarioGen:
         )
     async for s in kit.say(" ".join(lines)):
         yield s
-    async for s in kit.card(
-        "chart",
-        {
-            "title": f"{d['pipeline']['name']} by stage",
-            "currency": cur,
-            "series": [
-                {
-                    "id": s["id"],
-                    "name": s["name"],
-                    "color": s["color"],
-                    "kind": s["kind"],
-                    "count": s["count"],
-                    "value": s["value"],
-                    "weighted": s["weighted"],
-                }
-                for s in stages
-            ],
-            "totals": {
-                k: d[k]
-                for k in (
-                    "open_value",
-                    "weighted_value",
-                    "won_this_month_value",
-                    "won_this_month_count",
-                    "open_count",
-                    "stale_count",
-                )
-            },
-        },
-    ):
+    chart = ChartCard(
+        title=f"{d['pipeline']['name']} by stage",
+        currency=cur,
+        series=[ChartSeriesItem.model_validate(st) for st in stages],
+        totals=ChartTotals.model_validate(d),
+    )
+    async for s in kit.card("chart", chart.model_dump(mode="json")):
         yield s
     yield SuggestionsStep(
         ["Find stale deals and create follow-ups", "Show me hot leads"]

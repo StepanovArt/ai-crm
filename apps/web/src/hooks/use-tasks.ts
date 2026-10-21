@@ -34,6 +34,7 @@ function useInvalidateTasks() {
     void qc.invalidateQueries({ queryKey: qk.tasks.all });
     void qc.invalidateQueries({ queryKey: qk.activities.all });
     void qc.invalidateQueries({ queryKey: qk.dashboard.all });
+    void qc.invalidateQueries({ queryKey: qk.agent.all });
   };
 }
 

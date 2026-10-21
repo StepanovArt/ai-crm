@@ -1,12 +1,20 @@
-"""S7 — "Show me hot leads": filter contacts to score ≥ 70, navigate, highlight the top three."""
+"""S7 — "Show me hot leads": filter contacts to score >= 70, navigate, highlight the top three."""
 
 from typing import Any
 
+from app.agent.cards import RecordItem, RecordsCard
 from app.agent.providers.base import SuggestionsStep, ToolCallStep
 from app.agent.scenarios.common import ScenarioGen, items, need
 from app.agent.scenarios.kit import Kit
 
 HOT = 70
+
+
+def _line(i: int, c: dict[str, Any]) -> str:
+    company = (c.get("company") or {}).get("name")
+    reasons = c.get("reasons") or []
+    why = str(reasons[0]["detail"]).lower() if reasons else ""
+    return f"{i}. **{c['title']}**{f' ({company})' if company else ''} — {c['score']}{f' · {why}' if why else ''}"
 
 
 async def run(kit: Kit) -> ScenarioGen:
@@ -24,7 +32,8 @@ async def run(kit: Kit) -> ScenarioGen:
     total = int(found.data.get("total", 0))
     if not leads:
         async for s in kit.say(
-            f"No contacts score {HOT}+ right now. Replies and booked meetings push people up — want me to find quiet deals instead?"
+            f"No contacts score {HOT}+ right now. Replies and booked meetings push people up — "
+            "want me to find quiet deals instead?"
         ):
             yield s
         yield SuggestionsStep(["Find stale deals and create follow-ups"])
@@ -46,35 +55,27 @@ async def run(kit: Kit) -> ScenarioGen:
         ):
             yield s
 
-    def line(i: int, c: dict[str, Any]) -> str:
-        company = (c.get("company") or {}).get("name")
-        reasons = c.get("reasons") or []
-        why = str(reasons[0]["detail"]).lower() if reasons else ""
-        return f"{i}. **{c['title']}**{f' ({company})' if company else ''} — {c['score']}{f' · {why}' if why else ''}"
-
-    top = "\n".join(line(i + 1, c) for i, c in enumerate(leads[:3]))
+    top = "\n".join(_line(i + 1, c) for i, c in enumerate(leads[:3]))
     async for s in kit.say(
         f"\n\nThe top three:\n\n{top}\n\nI'd reach out to {str(leads[0]['title']).split()[0]} first."
     ):
         yield s
-    async for s in kit.card(
-        "records",
-        {
-            "title": "Hot leads",
-            "items": [
-                {
-                    "type": "contact",
-                    "id": c["id"],
-                    "title": c["title"],
-                    "subtitle": c.get("subtitle"),
-                    "badge": f"Score {c['score']}",
-                    "tone": "positive",
-                    "href": c["href"],
-                }
-                for c in leads[:5]
-            ],
-        },
-    ):
+    card = RecordsCard(
+        title="Hot leads",
+        items=[
+            RecordItem(
+                type="contact",
+                id=c["id"],
+                title=c["title"],
+                subtitle=c.get("subtitle"),
+                badge=f"Score {c['score']}",
+                tone="positive",
+                href=c["href"],
+            )
+            for c in leads[:5]
+        ],
+    )
+    async for s in kit.card("records", card.model_dump(mode="json")):
         yield s
     yield SuggestionsStep(
         [f"Draft a follow-up email to {leads[0]['title']}", "What's on my plate today?"]

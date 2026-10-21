@@ -43,6 +43,7 @@ function useInvalidateTimeline() {
     void qc.invalidateQueries({ queryKey: qk.deals.all });
     void qc.invalidateQueries({ queryKey: qk.contacts.all });
     void qc.invalidateQueries({ queryKey: qk.companies.all });
+    void qc.invalidateQueries({ queryKey: qk.agent.all });
   };
 }
 

@@ -245,3 +245,23 @@
     grid-template-rows: auto;
   }
 }
+
+/* Elements the agent is working on. */
+[data-agent-active="true"] {
+  position: relative;
+  z-index: 1;
+}
+[data-agent-pulse="true"] {
+  animation: agent-pulse 650ms ease-out;
+}
+@keyframes agent-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgb(139 92 246 / 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgb(139 92 246 / 0);
+  }
+}
+.agent-toast {
+  border-color: rgb(139 92 246 / 0.35) !important;
+}

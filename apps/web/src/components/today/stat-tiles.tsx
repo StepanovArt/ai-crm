@@ -39,7 +39,7 @@ function Tile({
 export function StatTiles({ stats, dealsLabel }: { stats: Today["stats"]; dealsLabel: string }) {
   const c = stats.currency;
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 @3xl:grid-cols-4">
       <Tile
         label="Open pipeline"
         value={formatMoney(stats.open_value, c, { compact: true })}
