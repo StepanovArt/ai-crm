@@ -1,12 +1,12 @@
 from fastapi import APIRouter
-from pydantic import BaseModel
 
 from app.config import get_settings
+from app.schemas.common import OutModel
 
 router = APIRouter(tags=["health"])
 
 
-class HealthOut(BaseModel):
+class HealthOut(OutModel):
     status: str
     app: str
     llm_provider: str

@@ -18,3 +18,8 @@ One line per decision: what and why.
 - 2026-10-21 — The demo workspace gets 3 teammates (Maya, Jonas, Priya @halo.dev, same password) so owners/avatars/filters look real.
 - 2026-10-21 — Industry templates are Python dataclasses (`onboarding/templates/*.py`) with curated company names per industry instead of Faker company names (Faker's read as fake).
 - 2026-10-21 — Tests run against `halo_test`: the schema is rebuilt with `alembic upgrade head` at session start (validates migrations), the demo seed is loaded once, and each test runs in an outer transaction rolled back at the end (`join_transaction_mode="create_savepoint"`).
+- 2026-10-21 — List pagination uses an opaque offset cursor (`next_cursor` = next offset); simple, works with any sort, and lists are small (≤ 500 per page).
+- 2026-10-21 — `filter` is validated by a per-object Pydantic model with `extra="forbid"`; custom-field filters use JSONB containment (`custom @> {...}`), which handles selects and multi-selects alike.
+- 2026-10-21 — Deal moves take a target `index` in the column; the server computes a float position between neighbours, so clients and the agent never compute positions.
+- 2026-10-21 — Added `GET /pipelines/{id}/board` (stages + totals + deals in one call) for the kanban; `/deals` list remains for tables.
+- 2026-10-21 — Response models set `json_schema_serialization_defaults_required` so generated TS types mark always-present fields as required; money uses a `Money` type that always serializes as a 2-decimal string.

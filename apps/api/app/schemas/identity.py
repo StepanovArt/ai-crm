@@ -2,7 +2,7 @@ import uuid
 
 from pydantic import BaseModel, EmailStr, Field
 
-from app.schemas.common import ORMModel
+from app.schemas.common import ORMModel, OutModel
 
 
 class UserOut(ORMModel):
@@ -12,7 +12,7 @@ class UserOut(ORMModel):
     avatar_url: str | None = None
 
 
-class Terminology(BaseModel):
+class Terminology(OutModel):
     deal: str = "Deal"
     deals: str = "Deals"
     company: str = "Company"
@@ -34,7 +34,7 @@ class MemberOut(UserOut):
     role: str
 
 
-class MeOut(BaseModel):
+class MeOut(OutModel):
     user: UserOut
     workspace: WorkspaceOut
     role: str

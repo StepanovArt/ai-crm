@@ -1,7 +1,7 @@
 # Progress
 
 ## Current phase
-Phase 2 — Core API
+Phase 3 — App shell & design system
 
 ## Phase 0 — Scaffold ✅
 - [x] Monorepo layout, docker-compose (Postgres 16), `.env.example`, Makefile
@@ -19,8 +19,17 @@ Phase 2 — Core API
 - [x] Scoring service with explainable breakdown + tests
 - [x] Deterministic, idempotent seed (`make seed`, `POST /demo/reset`): 30 companies, 60 contacts, 25 deals, 40 tasks, ~280 activities, stale deals, 8 hot leads
 
+## Phase 2 — Core API ✅
+- [x] Companies / contacts / deals / tasks / notes CRUD + list (`q`, `limit`, `cursor`, `sort` incl. `custom.<key>`, JSON `filter`)
+- [x] Enriched outputs without N+1 (bulk lookups: company/contact briefs, stage, last activity, open deal totals, agent-touched)
+- [x] Activities timeline per record (unions linked records), notes keep their timeline entry in sync
+- [x] Pipelines + stages CRUD/reorder, board endpoint with per-stage count/total/weighted value, `PATCH /deals/{id}/move` with index-based positioning
+- [x] Fields CRUD + reorder (deleting a field strips its values), `GET /contacts/{id}/score`, `GET /dashboard/today`
+- [x] `make types` → `apps/web/src/lib/api/schema.d.ts`; openapi-fetch client in `src/lib/api/client.ts`
+- [x] 74 pytest tests (happy + error path per router, HTTP-level isolation)
+
 ## Next
-- Phase 2: CRUD/list endpoints for companies, contacts, deals, tasks, notes; activities; pipelines/stages; deal move; fields; dashboard; `make types`
+- Phase 3: design system primitives, sidebar (terminology-aware), topbar, auth pages, protected routes, shared components
 
 ## Known issues
 - none

@@ -363,20 +363,31 @@ class WorkspaceBuilder:
         for plan in self.deal_plans:
             deal = plan.deal
             owner = next((u for u in self.users if u.id == deal.owner_id), self.owner)
-            self._activity(
-                "record_created", "deal", deal.id, plan.created_at, {"name": deal.name}, owner
-            )
-
             # Last touch: stale deals went quiet 9-30 days ago, others within the last week.
-            if plan.stale:
+            target = plan.stage_index
+            stage_kind = self.stages[target].kind
+            if stage_kind != "open":
+                # Two wins land this month (for "won this month"); other closes happened earlier.
+                if stage_kind == "won" and won_this_month < 2:
+                    won_this_month += 1
+                    closed_at = max(month_start + timedelta(hours=10), self.ago(rng.uniform(1, 6)))
+                    closed_at = min(closed_at, self.now - timedelta(hours=3))
+                else:
+                    closed_at = self.ago(rng.uniform(24, 45))
+                if plan.created_at > closed_at - timedelta(days=10):
+                    plan.created_at = closed_at - timedelta(days=rng.uniform(15, 35))
+                    deal.created_at = plan.created_at
+                last_touch = closed_at
+            elif plan.stale:
                 last_touch = self.ago(rng.uniform(9, 30))
             else:
                 last_touch = self.ago(rng.uniform(0.2, 6))
             last_touch = max(last_touch, plan.created_at + timedelta(hours=2))
+            self._activity(
+                "record_created", "deal", deal.id, plan.created_at, {"name": deal.name}, owner
+            )
 
             # Stage progression from the first stage to the current one.
-            target = plan.stage_index
-            stage_kind = self.stages[target].kind
             path = (
                 list(range(0, target + 1))
                 if stage_kind == "open"
@@ -384,15 +395,11 @@ class WorkspaceBuilder:
             )
             span = (last_touch - plan.created_at).total_seconds()
             entered = plan.created_at
+            # Open deals entered their current stage a while before the last touch.
+            reach = 1.0 if stage_kind != "open" or plan.stale else rng.uniform(0.45, 0.85)
             for step, (frm, to) in enumerate(itertools.pairwise(path), start=1):
-                when = plan.created_at + timedelta(seconds=span * step / max(1, len(path)))
-                if stage_kind == "won" and to == target and won_this_month < 2:
-                    when = max(
-                        month_start + timedelta(hours=10),
-                        self.now - timedelta(days=rng.uniform(1, 6)),
-                    )
-                    when = min(when, self.now - timedelta(hours=3))
-                    won_this_month += 1
+                frac = reach * step / max(1, len(path) - 1)
+                when = plan.created_at + timedelta(seconds=span * frac)
                 self._activity(
                     "stage_changed",
                     "deal",
