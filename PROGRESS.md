@@ -1,7 +1,7 @@
 # Progress
 
 ## Current phase
-Phase 9 — Polish & demo readiness
+All phases complete — MVP is demo-ready (see the demo script in `README.md`).
 
 ## Phase 0 — Scaffold ✅
 - [x] Monorepo layout, docker-compose (Postgres 16), `.env.example`, Makefile
@@ -84,8 +84,17 @@ Phase 9 — Polish & demo readiness
 - [x] Optional: `LLM_PROVIDER=openai` — OpenAI-compatible provider (streaming function calling; mutations only via approved plans; same cards and undo), tested with a fake server
 - Screens: `docs/screens/phase-8/`
 
-## Next
-- Phase 9: visual polish pass, shortcuts help dialog, 500-row performance + N+1 check, accessibility, README with screenshots/architecture/demo script, fresh-clone check
+## Phase 9 — Polish & demo readiness ✅
+- [x] Visual pass on every screen in light and dark: long names (two-line titles, clamped cards), zero/one/many and empty states, pipeline subtitle spacing, one-line option previews; insights never call closed deals "overdue"
+- [x] Shortcuts: `⌘K`, `⌘J`, `C`, `G` sequences, and a `?` help dialog (also in ⌘K); agent messages sent while a run is still animating are queued instead of dropped
+- [x] Performance: indexed "last activity" queries (500 contacts 6 s → ~50 ms, companies 10 s → ~30 ms); query-count regression tests for every list endpoint; tables render progressively with memoized rows (first row 2.5 s → 0.6 s for 500 rows, 60 fps scroll); editor popovers mount only while editing
+- [x] Accessibility: axe WCAG 2.1 A/AA audit in e2e for every main screen, AI panel, ⌘K and onboarding (light + dark) — zero violations; AA contrast tokens; no nested interactive controls
+- [x] Agent tool chips use the workspace vocabulary ("Searching opportunities…")
+- [x] README: screenshots, quickstart, architecture + sequence diagrams, demo script, plugging in a real LLM
+- [x] Fresh clone → `make setup` → `make seed` (twice, idempotent) → `make dev` → full demo script (`apps/web/scripts/demo-run.mjs`) passes with no browser errors; `make check` (126 pytest, 26 Vitest, ruff, mypy, ESLint, tsc) and `make e2e` (28 Playwright tests) green
+- Screens: `docs/screens/phase-9/`
 
-## Known issues
-- none
+## Known limitations
+- The mock agent understands the demo intents (Section 12 plus a few more); anything else gets a helpful fallback. Use `LLM_PROVIDER=openai` for open-ended conversation.
+- No real email sending, calendar sync or enrichment (out of scope for the MVP).
+- Tables render up to 500 rows per page without virtualization.

@@ -45,13 +45,14 @@ account **`demo@halo.dev` / `demo1234`**.
 ## Demo script
 
 The whole flow takes about five minutes. Each step uses only the UI.
+`apps/web/scripts/demo-run.mjs` runs the same script automatically in a browser.
 
 | # | Do this | Watch for |
 |---|---|---|
 | 1 | **Sign up**, then type *"We sell industrial equipment to factories"* (or click a chip) → **Build my workspace** | Steps check off on the left. On the right, a live miniature of the app relabels its sidebar (*Opportunities, Customers*), drops in kanban columns one by one and fills them with sample deals and fields. Then it lands on Today. |
 | 2 | **Today** | The AI briefing streams in. *Who to contact next* ranks people by score, with reason chips (*Replied recently*, *Meeting scheduled*…). |
 | 3 | `⌘K` → *"Find stale deals and create follow-ups"* → **Approve** | A plan card lists one task per stale deal. After approval the agent cursor highlights each deal on the pipeline, the tasks appear, and **Undo** removes them all again. |
-| 4 | Ask *"Move Acme to Negotiation"* → **Approve** | The agent resolves "Acme" to the *Acme Analytics — Annual plan* deal, and the card slides into the Negotiation column. **Undo** slides it back. |
+| 4 | Ask *"Move Bergmann to Negotiation"* → **Approve** (in the demo account: *"Move Acme to Negotiation"*) | The agent resolves the name to the right deal (*Bergmann Automotive Parts — CNC machining center*), and the card slides into the Negotiation column. **Undo** slides it back. |
 | 5 | Open a contact → **Draft email** in the AI insight → **Save as note** | An email card with a draft based on the real timeline; saving adds it to the timeline. |
 | 6 | Ask *"How's the pipeline this month?"* | A short narrative and a chart card, built from live pipeline numbers. |
 | 7 | **Settings → Fields → Add field** | The new column appears in the table straight away, with no code change. |
@@ -218,7 +219,7 @@ apps/
       agent/                orchestrator, tools, providers, scenarios, insights, undo
       onboarding/           industry templates + streamed workspace generator
       seed/                 deterministic workspace builder (demo + onboarding)
-    tests/                  pytest (125 tests: API, isolation, agent scenarios, undo, query counts)
+    tests/                  pytest (126 tests: API, isolation, agent scenarios, undo, query counts)
   web/                      Next.js 15 · Tailwind v4 · shadcn/ui · TanStack Query/Table · motion
     src/
       app/                  routes: (auth), onboarding, (app)/today|pipeline|deals|…
@@ -249,7 +250,7 @@ The demo can also be reset from the app (workspace menu → *Reset demo data*) o
 
 ### Quality gates
 
-- **API:** 125 pytest tests. They cover every router's happy and error paths, workspace
+- **API:** 126 pytest tests. They cover every router's happy and error paths, workspace
   isolation, field validation, scoring, each agent scenario's event sequence and database
   effects, exact undo, onboarding (*"We sell apartments in new developments"* → a real-estate
   workspace), the OpenAI-compatible provider, and SQL query counts (no N+1, 500-row lists in
