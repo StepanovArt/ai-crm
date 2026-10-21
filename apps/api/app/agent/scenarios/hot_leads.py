@@ -6,8 +6,7 @@ from app.agent.cards import RecordItem, RecordsCard
 from app.agent.providers.base import SuggestionsStep, ToolCallStep
 from app.agent.scenarios.common import ScenarioGen, items, need
 from app.agent.scenarios.kit import Kit
-
-HOT = 70
+from app.services.scoring import HOT_SCORE
 
 
 def _line(i: int, c: dict[str, Any]) -> str:
@@ -24,7 +23,7 @@ async def run(kit: Kit) -> ScenarioGen:
         (
             yield ToolCallStep(
                 "search_records",
-                {"object_type": "contact", "score_min": HOT, "sort": "-score", "limit": 10},
+                {"object_type": "contact", "score_min": HOT_SCORE, "sort": "-score", "limit": 10},
             )
         )
     )
@@ -32,7 +31,7 @@ async def run(kit: Kit) -> ScenarioGen:
     total = int(found.data.get("total", 0))
     if not leads:
         async for s in kit.say(
-            f"No contacts score {HOT}+ right now. Replies and booked meetings push people up — "
+            f"No contacts score {HOT_SCORE}+ right now. Replies and booked meetings push people up — "
             "want me to find quiet deals instead?"
         ):
             yield s
@@ -40,13 +39,13 @@ async def run(kit: Kit) -> ScenarioGen:
         return
 
     async for s in kit.say(
-        f"You have **{total} hot lead{'s' if total != 1 else ''}** (score {HOT}+). Pulling them up…"
+        f"You have **{total} hot lead{'s' if total != 1 else ''}** (score {HOT_SCORE}+). Pulling them up…"
     ):
         yield s
     async for s in kit.ui({"kind": "navigate", "href": "/contacts"}):
         yield s
     async for s in kit.ui(
-        {"kind": "apply_filter", "view": "contacts", "filter": {"score_min": HOT}}
+        {"kind": "apply_filter", "view": "contacts", "filter": {"score_min": HOT_SCORE}}
     ):
         yield s
     for lead in leads[:3]:

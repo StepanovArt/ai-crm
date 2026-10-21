@@ -23,6 +23,10 @@ page.on("console", (m) => m.type() === "error" && console.error("console:", m.te
 for (const p of paths) {
   await page.goto(`${WEB}${p}`, { waitUntil: "networkidle" });
   await page.waitForTimeout(Number(process.env.WAIT ?? 900));
+  for (const key of (process.env.PRESS ?? "").split(",").filter(Boolean)) {
+    await page.keyboard.press(key);
+    await page.waitForTimeout(400);
+  }
   const name = p.replace(/[^a-z0-9]+/gi, "_").replace(/^_|_$/g, "") || "root";
   await page.screenshot({ path: `${outDir}/${name}-${theme}.png`, fullPage: Boolean(process.env.FULL) });
   console.log(`${outDir}/${name}-${theme}.png`);

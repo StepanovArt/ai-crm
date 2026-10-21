@@ -18,7 +18,6 @@ from decimal import Decimal
 from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.agent.scenarios.hot_leads import HOT
 from app.agent.timeutil import money
 from app.errors import ConflictError, NotFoundError
 from app.models import (
@@ -48,6 +47,7 @@ from app.onboarding.events import (
 )
 from app.onboarding.templates import DEFAULT_TEMPLATE, TEMPLATES, IndustryTemplate
 from app.seed.builder import WorkspaceBuilder
+from app.services.scoring import HOT_SCORE
 from app.services.workspaces import DEFAULT_TERMINOLOGY, effective_terminology
 
 log = logging.getLogger(__name__)
@@ -338,7 +338,7 @@ async def generate(
             hot = await session.scalar(
                 select(func.count())
                 .select_from(Contact)
-                .where(Contact.workspace_id == workspace.id, Contact.score >= HOT)
+                .where(Contact.workspace_id == workspace.id, Contact.score >= HOT_SCORE)
             )
             await pace.pause(400, 600)
             yield done(

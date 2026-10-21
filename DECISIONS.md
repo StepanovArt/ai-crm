@@ -52,3 +52,7 @@ One line per decision: what and why.
 - 2026-10-21 — New workspaces are seeded from `workspace_id.int` so seeded ids never collide across workspaces; sample teammates get `team-<id>.example.com` emails and an unusable password hash.
 - 2026-10-21 — The seed builder only draws a unit number when a deal pattern uses `{unit}`, so adding real-estate patterns didn't shift the demo workspace's deterministic data.
 - 2026-10-21 — The SSE client is generic (`streamSSE<E>`), shared by the agent and onboarding streams.
+- 2026-10-21 — "Last activity" for companies/contacts is computed with one indexed aggregate per related type (company + its contacts; contact + their deals) merged in Python. The previous single query joined activities with `OR` conditions, which Postgres can't index: 500 contacts took 6 s, now ~50 ms.
+- 2026-10-21 — Large tables render progressively (60 rows at once, then 120-row chunks in `startTransition`, with a spacer row keeping the scrollbar stable) instead of adding a virtualization dependency. Rows are memoized and column definitions read callbacks through refs, so selecting or editing a row re-renders only that row.
+- 2026-10-21 — Inline-edit popovers mount only while a cell is being edited (anchored through Radix `virtualRef`), so a 500-row table doesn't create ~4 000 idle Popper instances.
+- 2026-10-21 — The hot-lead threshold lives in one place per side (`services.scoring.HOT_SCORE`, `lib/records/views.HOT_SCORE`); onboarding no longer imports from agent scenarios (that import was circular).

@@ -4,10 +4,10 @@ from typing import Any
 
 from sqlalchemy import func, or_, select
 
-from app.models import Activity, Company, Contact, Deal, Stage
+from app.models import Company, Contact, Deal, Stage
 from app.schemas.records import CompanyCreate, CompanyFilter, CompanyOut, CompanyUpdate
 from app.services import fields as fields_service
-from app.services.activities import record_activity
+from app.services.activities import latest_activity, merge_latest, record_activity
 from app.services.common import diff_changes, ensure_member, humanize_changes, purge_related
 from app.services.context import Ctx
 from app.services.listing import ListParams, like, sort_clauses
@@ -52,25 +52,21 @@ async def enrich(ctx: Ctx, companies: list[Company]) -> list[CompanyOut]:
         )
     ).all()
     deals = {cid: (int(n), Decimal(v)) for cid, n, v in deal_rows}
-    contact_ids = select(Contact.id).where(
-        Contact.workspace_id == ctx.workspace_id, Contact.company_id == Company.id
-    )
-    last_rows = (
-        await ctx.session.execute(
-            select(Company.id, func.max(Activity.occurred_at))
-            .join(
-                Activity,
-                or_(
-                    (Activity.related_type == "company") & (Activity.related_id == Company.id),
-                    (Activity.related_type == "contact")
-                    & Activity.related_id.in_(contact_ids.scalar_subquery()),
-                ),
+    # Last activity: on the company itself or on any of its contacts.
+    last = await latest_activity(ctx, "company", ids)
+    contact_company = dict(
+        (
+            await ctx.session.execute(
+                select(Contact.id, Contact.company_id).where(
+                    Contact.workspace_id == ctx.workspace_id, Contact.company_id.in_(ids)
+                )
             )
-            .where(Company.id.in_(ids), Activity.workspace_id == ctx.workspace_id)
-            .group_by(Company.id)
         )
-    ).all()
-    last = dict(last_rows)
+        .tuples()
+        .all()
+    )
+    via_contacts = await latest_activity(ctx, "contact", contact_company)
+    merge_latest(last, ((contact_company[c], when) for c, when in via_contacts.items()))
     out: list[CompanyOut] = []
     for c in companies:
         n_deals, value = deals.get(c.id, (0, Decimal("0")))

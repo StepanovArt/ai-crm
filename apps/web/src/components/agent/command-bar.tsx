@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Building2, CircleDollarSign, Moon, Plus, Sparkles, User } from "lucide-react";
+import { Building2, CircleDollarSign, Keyboard, Moon, Plus, Sparkles, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 
@@ -98,6 +98,7 @@ function RecordResults({ q, onPick }: { q: string; onPick: (href: string) => voi
 export function CommandBar() {
   const open = useUIStore((s) => s.commandOpen);
   const setOpen = useUIStore((s) => s.setCommandOpen);
+  const setShortcutsOpen = useUIStore((s) => s.setShortcutsOpen);
   const send = useAgentStore((s) => s.send);
   const router = useRouter();
   const t = useTerms();
@@ -129,6 +130,22 @@ export function CommandBar() {
     { label: `New ${t.company.toLowerCase()}`, href: "/companies?create=1" },
     { label: `New ${t.contact.toLowerCase()}`, href: "/contacts?create=1" },
   ].filter((c) => !lower || c.label.toLowerCase().includes(lower));
+  const actions = [
+    {
+      key: "theme",
+      label: "Toggle dark mode",
+      icon: Moon,
+      hint: null,
+      run: () => setTheme(resolvedTheme === "dark" ? "light" : "dark"),
+    },
+    {
+      key: "shortcuts",
+      label: "Keyboard shortcuts",
+      icon: Keyboard,
+      hint: "?",
+      run: () => setShortcutsOpen(true),
+    },
+  ].filter((a) => !lower || `${a.label} ${a.key}`.toLowerCase().includes(lower));
   const matchingPrompts = prompts.filter((p) => !lower || p.toLowerCase().includes(lower));
 
   return (
@@ -193,7 +210,7 @@ export function CommandBar() {
                 </CommandGroup>
               </>
             )}
-            {(create.length > 0 || !lower || "theme".includes(lower)) && (
+            {(create.length > 0 || actions.length > 0) && (
               <CommandGroup heading="Actions">
                 {create.map((c) => (
                   <CommandItem key={c.href} value={c.href} onSelect={() => go(c.href)}>
@@ -201,16 +218,20 @@ export function CommandBar() {
                     {c.label}
                   </CommandItem>
                 ))}
-                <CommandItem
-                  value="theme"
-                  onSelect={() => {
-                    setTheme(resolvedTheme === "dark" ? "light" : "dark");
-                    setOpen(false);
-                  }}
-                >
-                  <Moon />
-                  Toggle dark mode
-                </CommandItem>
+                {actions.map((a) => (
+                  <CommandItem
+                    key={a.key}
+                    value={a.key}
+                    onSelect={() => {
+                      setOpen(false);
+                      a.run();
+                    }}
+                  >
+                    <a.icon />
+                    {a.label}
+                    {a.hint && <Kbd className="ml-auto">{a.hint}</Kbd>}
+                  </CommandItem>
+                ))}
               </CommandGroup>
             )}
           </CommandList>

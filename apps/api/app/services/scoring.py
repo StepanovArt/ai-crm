@@ -40,6 +40,8 @@ SIGNALS: tuple[Signal, ...] = (
     Signal("stale_14d", "No touch in 14+ days", -20),
 )
 
+# Contacts at or above this score are "hot leads".
+HOT_SCORE = 70
 REPLY_WINDOW = timedelta(days=14)
 MEETING_WINDOW = timedelta(days=14)
 OPENS_WINDOW = timedelta(days=30)

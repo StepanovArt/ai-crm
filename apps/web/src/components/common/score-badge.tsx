@@ -8,8 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { api, unwrap } from "@/lib/api/client";
 import { qk } from "@/lib/query-keys";
 import { cn } from "@/lib/utils";
-
-export const HOT_SCORE = 70;
+import { HOT_SCORE } from "@/lib/records/views";
 
 function tier(score: number) {
   if (score >= HOT_SCORE)

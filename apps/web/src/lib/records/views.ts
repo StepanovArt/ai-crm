@@ -1,5 +1,8 @@
 import type { RecordType } from "@/hooks/use-records";
 
+/** Contacts at or above this score are "hot leads" (mirrors `HOT_SCORE` in the API). */
+export const HOT_SCORE = 70;
+
 export type SavedView = {
   key: string;
   label: string;
@@ -14,7 +17,7 @@ export const VIEWS: Record<RecordType, SavedView[]> = {
   ],
   contact: [
     { key: "all", label: "All" },
-    { key: "hot", label: "Hot leads", filter: () => ({ score_min: 70 }), sort: "-score" },
+    { key: "hot", label: "Hot leads", filter: () => ({ score_min: HOT_SCORE }), sort: "-score" },
     { key: "mine", label: "Mine", filter: (me) => ({ owner_id: me }) },
     { key: "customers", label: "Customers", filter: () => ({ lead_status: "customer" }) },
   ],

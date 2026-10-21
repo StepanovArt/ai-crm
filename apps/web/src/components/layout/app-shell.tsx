@@ -13,6 +13,7 @@ import { ApiError } from "@/lib/api/client";
 import { useUIStore } from "@/stores/ui-store";
 
 import { FullScreenLoader } from "./full-screen-loader";
+import { ShortcutsDialog } from "./shortcuts-dialog";
 import { Sidebar } from "./sidebar";
 import { Topbar } from "./topbar";
 
@@ -73,6 +74,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <React.Suspense>
         <AgentRuntime />
         <CommandBar />
+        <ShortcutsDialog />
       </React.Suspense>
     </div>
   );

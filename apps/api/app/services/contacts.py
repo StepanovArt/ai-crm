@@ -4,7 +4,7 @@ from typing import Any
 from sqlalchemy import func, or_, select
 
 from app.errors import ValidationFailed
-from app.models import Activity, Company, Contact, Deal, Stage
+from app.models import Company, Contact, Deal, Stage
 from app.schemas.records import (
     CompanyBrief,
     ContactBrief,
@@ -16,7 +16,7 @@ from app.schemas.records import (
     ScoreSignalOut,
 )
 from app.services import fields as fields_service
-from app.services.activities import record_activity
+from app.services.activities import latest_activity, merge_latest, record_activity
 from app.services.common import diff_changes, ensure_member, humanize_changes, purge_related
 from app.services.context import Ctx
 from app.services.listing import ListParams, like, sort_clauses
@@ -57,28 +57,21 @@ async def enrich(ctx: Ctx, contacts: list[Contact]) -> list[ContactOut]:
         ).all()
     }
     ids = [c.id for c in contacts]
-    deal_ids = select(Deal.id).where(
-        Deal.workspace_id == ctx.workspace_id, Deal.primary_contact_id == Contact.id
-    )
-    last = dict(
+    # Last activity: on the contact itself or on deals where they are the primary contact.
+    last = await latest_activity(ctx, "contact", ids)
+    deal_contact = dict(
         (
             await ctx.session.execute(
-                select(Contact.id, func.max(Activity.occurred_at))
-                .join(
-                    Activity,
-                    or_(
-                        (Activity.related_type == "contact") & (Activity.related_id == Contact.id),
-                        (Activity.related_type == "deal")
-                        & Activity.related_id.in_(deal_ids.scalar_subquery()),
-                    ),
+                select(Deal.id, Deal.primary_contact_id).where(
+                    Deal.workspace_id == ctx.workspace_id, Deal.primary_contact_id.in_(ids)
                 )
-                .where(Contact.id.in_(ids), Activity.workspace_id == ctx.workspace_id)
-                .group_by(Contact.id)
             )
         )
         .tuples()
         .all()
     )
+    via_deals = await latest_activity(ctx, "deal", deal_contact)
+    merge_latest(last, ((deal_contact[d], when) for d, when in via_deals.items()))
     out: list[ContactOut] = []
     for c in contacts:
         item = ContactOut.model_validate(c)

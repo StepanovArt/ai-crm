@@ -40,6 +40,7 @@ export function EditableField({
   className?: string;
 }) {
   const [open, setOpen] = React.useState(false);
+  const anchorRef = React.useRef<HTMLDivElement>(null);
   const display = (
     <FieldRenderer
       type={type}
@@ -69,52 +70,66 @@ export function EditableField({
     if (!same(normalized, value)) onSave(normalized);
   }
 
+  // The popover mounts only while editing: a 500-row table would otherwise create thousands
+  // of idle Popper instances. It anchors to the cell through a virtual ref, so the cell
+  // element itself never remounts.
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverAnchor asChild>
-        <div
-          role="button"
-          tabIndex={0}
-          aria-label={`Edit ${label}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            setOpen(true);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              setOpen(true);
-            }
-          }}
-          className={cn(
-            "-mx-1.5 flex min-h-7 min-w-0 cursor-text items-center rounded-md px-1.5 transition-colors outline-none hover:bg-accent/70 focus-visible:ring-2 focus-visible:ring-ring/40",
-            open && "bg-accent",
-            className,
-          )}
-        >
-          {display}
-        </div>
-      </PopoverAnchor>
-      <PopoverContent
-        align="start"
-        sideOffset={-30}
-        className="overflow-hidden p-0"
-        style={{ width: editorWidth(type) }}
-        onClick={(e) => e.stopPropagation()}
-        onOpenAutoFocus={(e) => {
-          // Let the editor's own autoFocus win.
-          e.preventDefault();
+    <>
+      <div
+        ref={anchorRef}
+        role="button"
+        tabIndex={0}
+        aria-label={`Edit ${label}`}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen(true);
         }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            setOpen(true);
+          }
+        }}
+        className={cn(
+          "-mx-1.5 flex min-h-7 min-w-0 cursor-text items-center rounded-md px-1.5 transition-colors outline-none hover:bg-accent/70 focus-visible:ring-2 focus-visible:ring-ring/40",
+          open && "bg-accent",
+          className,
+        )}
       >
-        <FieldEditor
-          type={type}
-          value={value}
-          options={options}
-          label={label}
-          onCommit={commit}
-          onCancel={() => setOpen(false)}
-        />
-      </PopoverContent>
-    </Popover>
+        {display}
+      </div>
+      {open && (
+        <Popover open onOpenChange={setOpen}>
+          <PopoverAnchor virtualRef={anchorRef as React.RefObject<HTMLDivElement>} />
+          <PopoverContent
+            align="start"
+            sideOffset={-30}
+            className="overflow-hidden p-0"
+            style={{ width: editorWidth(type) }}
+            onClick={(e) => e.stopPropagation()}
+            onOpenAutoFocus={(e) => {
+              // Let the editor's own autoFocus win.
+              e.preventDefault();
+            }}
+            onCloseAutoFocus={(e) => {
+              // Return focus to the cell unless the user moved it somewhere else.
+              e.preventDefault();
+              if (document.activeElement === document.body) anchorRef.current?.focus();
+            }}
+          >
+            <FieldEditor
+              type={type}
+              value={value}
+              options={options}
+              label={label}
+              onCommit={commit}
+              onCancel={() => setOpen(false)}
+            />
+          </PopoverContent>
+        </Popover>
+      )}
+    </>
   );
 }

@@ -1,13 +1,13 @@
 """Activity writer. Every mutating service calls `record_activity`."""
 
 import uuid
-from collections.abc import Iterator
+from collections.abc import Iterable, Iterator
 from contextlib import contextmanager
 from contextvars import ContextVar
 from datetime import datetime
 from typing import Any, Literal
 
-from sqlalchemy import and_, or_, select
+from sqlalchemy import and_, func, or_, select
 from sqlalchemy.sql.elements import ColumnElement
 
 from app.models import Activity, Contact, Deal
@@ -153,3 +153,32 @@ async def list_timeline(
         stmt = stmt.where(Activity.occurred_at < before)
     stmt = stmt.order_by(Activity.occurred_at.desc()).limit(limit)
     return list((await ctx.session.scalars(stmt)).all())
+
+
+async def latest_activity(
+    ctx: Ctx, related_type: RelatedType, ids: Iterable[uuid.UUID]
+) -> dict[uuid.UUID, datetime]:
+    """Most recent activity per record (direct activities only; one indexed aggregate)."""
+    id_list = list(ids)
+    if not id_list:
+        return {}
+    rows = await ctx.session.execute(
+        select(Activity.related_id, func.max(Activity.occurred_at))
+        .where(
+            Activity.workspace_id == ctx.workspace_id,
+            Activity.related_type == related_type,
+            Activity.related_id.in_(id_list),
+        )
+        .group_by(Activity.related_id)
+    )
+    return dict(rows.tuples().all())
+
+
+def merge_latest(
+    into: dict[uuid.UUID, datetime], rows: Iterable[tuple[uuid.UUID | None, datetime]]
+) -> dict[uuid.UUID, datetime]:
+    """Fold (owner_id, when) pairs into `into`, keeping the latest per owner."""
+    for owner, when in rows:
+        if owner is not None and (owner not in into or when > into[owner]):
+            into[owner] = when
+    return into
