@@ -444,6 +444,8 @@ class WorkspaceBuilder:
                     owner,
                 )
                 scheduled = self.now + timedelta(days=rng.randint(1, 8))
+                while scheduled.weekday() >= 5:
+                    scheduled += timedelta(days=1)
                 scheduled = datetime.combine(
                     scheduled.date(), time(rng.choice([10, 11, 14, 15, 16])), UTC
                 )

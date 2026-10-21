@@ -1,6 +1,9 @@
 """Activity writer. Every mutating service calls `record_activity`."""
 
 import uuid
+from collections.abc import Iterator
+from contextlib import contextmanager
+from contextvars import ContextVar
 from datetime import datetime
 from typing import Any, Literal
 
@@ -27,6 +30,19 @@ ActivityType = Literal[
 ]
 RelatedType = Literal["company", "contact", "deal"]
 
+_collector: ContextVar[list[uuid.UUID] | None] = ContextVar("activity_collector", default=None)
+
+
+@contextmanager
+def collect_activities() -> Iterator[list[uuid.UUID]]:
+    """Collect ids of activities written inside the block (used for exact agent undo)."""
+    ids: list[uuid.UUID] = []
+    token = _collector.set(ids)
+    try:
+        yield ids
+    finally:
+        _collector.reset(token)
+
 
 async def record_activity(
     ctx: Ctx,
@@ -51,6 +67,9 @@ async def record_activity(
     )
     ctx.session.add(activity)
     await ctx.session.flush()
+    collected = _collector.get()
+    if collected is not None:
+        collected.append(activity.id)
 
     deal_id = _deal_id_for(related_type, related_id, payload or {})
     if deal_id is not None and type in INTERACTION_TYPES:

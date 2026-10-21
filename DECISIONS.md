@@ -32,3 +32,10 @@ One line per decision: what and why.
 - 2026-10-21 — Today's "Due today" shows the signed-in user's tasks; the contact queue is workspace-wide (top 8 by score).
 - 2026-10-21 — Today's stage chart is a single-series HTML bar list (one hue, value at the tip, tooltip) rather than recharts — better typography for 5–7 bars; recharts is used for the agent's chart card.
 - 2026-10-21 — Playwright global setup resets the demo workspace (`POST /demo/reset`) so e2e runs are deterministic; tests clean up the fields/stages they add.
+- 2026-10-21 — Event protocol extensions: `message_start.conversation_id`, `message_end.suggestions` (clickable prompts) and card kind `next_step` (one-click "Create task" from a summary). Everything else matches Section 6.2.
+- 2026-10-21 — Plans are stored as data (steps with tool + args + before/after ui_actions, prelude, finale, summary). Execution is provider-agnostic, so a real LLM provider reuses the same executor.
+- 2026-10-21 — Orchestrator commits after every tool call so `invalidate` ui_actions refetch committed data; a provider asking for a mutating tool outside an approved plan gets a failed tool_result instead.
+- 2026-10-21 — Exact undo: `services.activities.collect_activities()` records ids of activities written during a tool run; tools snapshot affected rows (deal stage/position/timestamps, record fields) and restore them; scores are recomputed afterwards.
+- 2026-10-21 — `search_records` also searches tasks (`object_type: task`, buckets, `mine`) because S1 needs tasks and the Section 6.4 tool list has no task reader; contact results include top score reasons.
+- 2026-10-21 — The briefing exists as JSON (`GET /agent/briefing`) and as an unsaved SSE stream (`GET /agent/briefing/stream`) that runs the S1 scenario without creating a conversation; Today uses the stream.
+- 2026-10-21 — Mock "intelligence" (insights, next steps, drafts) is rule-based over real data in `agent/insights.py` / `agent/drafting.py`; it is shared by tools, `/agent/insights` and scenarios.

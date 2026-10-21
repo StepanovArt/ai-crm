@@ -1,7 +1,7 @@
 # Progress
 
 ## Current phase
-Phase 6 — Agent backend
+Phase 7 — Agent frontend
 
 ## Phase 0 — Scaffold ✅
 - [x] Monorepo layout, docker-compose (Postgres 16), `.env.example`, Makefile
@@ -56,8 +56,17 @@ Phase 6 — Agent backend
 - [x] Playwright: drag & drop persists + writes activity; settings field → table; terminology → nav; new stage → kanban column
 - Screens: `docs/screens/phase-5/`
 
+## Phase 6 — Agent backend ✅
+- [x] `agent/events.py`: typed AgentEvent + UIAction unions (exposed via `GET /agent/events/schema` so web types are generated)
+- [x] 10 tools (`agent/tools/`), Pydantic args, labels, `mutating` flag, `inverse` + exact `undo` (activity collector + snapshots)
+- [x] Orchestrator: drives provider via `asend`, refuses mutations outside approved plans, records `agent_actions`, commits per tool, persists conversations/messages/plans
+- [x] Mock provider: ordered intent router (+ page context), scenarios S1–S7 + create-task + fallback, realistic pacing (1–4 word tokens, 25–45 ms, 300–700 ms thinking, 150–300 ms between ui_actions; highlights wait for their duration)
+- [x] Endpoints: chat (SSE), plans approve (SSE) / reject, actions/undo (returns ui_actions e.g. slide card back), conversations list/detail, insights, briefing (JSON + SSE stream)
+- [x] Deterministic insights (summary, bullets, next step) and email drafts from real timeline data
+- [x] Tests: each scenario's event sequence + DB effects; S2/S3 undo restores tasks/activities/deals/scores exactly; mutation guard; isolation; insights/briefing (98 API tests total)
+
 ## Next
-- Phase 6: agent events, tools, orchestrator, mock provider (S1–S7), plans/actions/undo, insights, briefing
+- Phase 7: SSE client + agent store, AgentPanel, PlanCard, ToolCallChip, cards, ui_action executor + AgentCursor, ⌘K CommandBar, InlineInsight, streamed briefing, agent badges
 
 ## Known issues
 - none

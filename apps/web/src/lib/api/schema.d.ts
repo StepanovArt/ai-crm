@@ -518,6 +518,194 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/agent/chat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Chat
+         * @description Send a message to the agent. Streams AgentEvents (SSE).
+         */
+        post: operations["chat"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agent/plans/{plan_id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve Plan
+         * @description Approve a proposed plan and stream its execution (SSE).
+         */
+        post: operations["approve_plan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agent/plans/{plan_id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reject Plan */
+        post: operations["reject_plan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agent/actions/undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Undo */
+        post: operations["undo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agent/conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Conversations */
+        get: operations["list_conversations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agent/conversations/{conversation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Conversation */
+        get: operations["get_conversation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agent/insights": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Insights
+         * @description Inline AI insight (summary + next step) for a record page.
+         */
+        get: operations["insights"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agent/briefing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Briefing
+         * @description Structured daily briefing for the Today page.
+         */
+        get: operations["briefing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agent/briefing/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Briefing Stream
+         * @description The same briefing, streamed like an agent reply (not saved to a conversation).
+         */
+        get: operations["briefing_stream"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agent/events/schema": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Events Schema
+         * @description Exposes the AgentEvent union in OpenAPI so the web client gets generated types.
+         */
+        get: operations["events_schema"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/demo/reset": {
         parameters: {
             query?: never;
@@ -573,6 +761,24 @@ export interface components {
              */
             occurred_at: string;
         };
+        /** ApplyFilterAction */
+        ApplyFilterAction: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "apply_filter";
+            /** View */
+            view: string;
+            /** Filter */
+            filter: {
+                [key: string]: unknown;
+            };
+        };
+        /** ApproveIn */
+        ApproveIn: {
+            context?: components["schemas"]["PageContext"];
+        };
         /** BoardOut */
         BoardOut: {
             pipeline: components["schemas"]["PipelineOut"];
@@ -580,6 +786,71 @@ export interface components {
             columns: components["schemas"]["StageColumn"][];
             /** Deals */
             deals: components["schemas"]["DealOut"][];
+        };
+        /** Briefing */
+        Briefing: {
+            /** Greeting */
+            greeting: string;
+            /** Headline */
+            headline: string;
+            /** Markdown */
+            markdown: string;
+            /** Items */
+            items: components["schemas"]["BriefingItem"][];
+            /**
+             * Generated At
+             * Format: date-time
+             */
+            generated_at: string;
+        };
+        /** BriefingItem */
+        BriefingItem: {
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "task" | "contact" | "deal";
+            /** Id */
+            id: string;
+            /** Title */
+            title: string;
+            /** Subtitle */
+            subtitle?: string | null;
+            /** Badge */
+            badge?: string | null;
+            /**
+             * Tone
+             * @default neutral
+             * @enum {string}
+             */
+            tone?: "danger" | "warning" | "positive" | "neutral";
+            /** Href */
+            href: string;
+        };
+        /** CardEvent */
+        CardEvent: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "card";
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "records" | "chart" | "email_draft" | "stats" | "next_step";
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            };
+        };
+        /** ChatIn */
+        ChatIn: {
+            /** Conversation Id */
+            conversation_id?: string | null;
+            /** Message */
+            message: string;
+            context?: components["schemas"]["PageContext"];
         };
         /** CompanyBrief */
         CompanyBrief: {
@@ -797,6 +1068,54 @@ export interface components {
                 [key: string]: unknown;
             } | null;
         };
+        /** ConversationDetailOut */
+        ConversationDetailOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Messages */
+            messages: components["schemas"]["MessageOut"][];
+            /** Plan Status */
+            plan_status: {
+                [key: string]: string;
+            };
+            /** Undone Action Ids */
+            undone_action_ids: string[];
+        };
+        /** ConversationOut */
+        ConversationOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
         /** DealCreate */
         DealCreate: {
             /** Name */
@@ -921,6 +1240,16 @@ export interface components {
                 [key: string]: unknown;
             } | null;
         };
+        /** ErrorEvent */
+        ErrorEvent: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "error";
+            /** Message */
+            message: string;
+        };
         /** FieldDefinitionCreate */
         FieldDefinitionCreate: {
             /**
@@ -1026,6 +1355,60 @@ export interface components {
             /** Llm Provider */
             llm_provider: string;
         };
+        /** HighlightAction */
+        HighlightAction: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "highlight";
+            /** Target */
+            target: string;
+            /** Duration Ms */
+            duration_ms?: number | null;
+        };
+        /** Insight */
+        Insight: {
+            /**
+             * Record Type
+             * @enum {string}
+             */
+            record_type: "company" | "contact" | "deal";
+            /**
+             * Record Id
+             * Format: uuid
+             */
+            record_id: string;
+            /** Title */
+            title: string;
+            /** Headline */
+            headline: string;
+            /**
+             * Tone
+             * @enum {string}
+             */
+            tone: "positive" | "neutral" | "warning";
+            /** Summary */
+            summary: string;
+            /** Bullets */
+            bullets: string[];
+            next_step: components["schemas"]["NextStep"] | null;
+            /**
+             * Generated At
+             * Format: date-time
+             */
+            generated_at: string;
+        };
+        /** InvalidateAction */
+        InvalidateAction: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "invalidate";
+            /** Query Keys */
+            query_keys: string[][];
+        };
         /** LoginIn */
         LoginIn: {
             /**
@@ -1058,6 +1441,94 @@ export interface components {
             avatar_url: string | null;
             /** Role */
             role: string;
+        };
+        /** MessageEndEvent */
+        MessageEndEvent: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "message_end";
+            /** Message Id */
+            message_id: string;
+            /** Undo Action Ids */
+            undo_action_ids?: string[] | null;
+            /** Suggestions */
+            suggestions?: string[] | null;
+        };
+        /** MessageOut */
+        MessageOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Role */
+            role: string;
+            /** Content */
+            content: string;
+            /** Events */
+            events: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** MessageStartEvent */
+        MessageStartEvent: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "message_start";
+            /** Message Id */
+            message_id: string;
+            /** Conversation Id */
+            conversation_id?: string | null;
+        };
+        /** MoveCardAction */
+        MoveCardAction: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "move_card";
+            /** Deal Id */
+            deal_id: string;
+            /** To Stage Id */
+            to_stage_id: string;
+        };
+        /** NavigateAction */
+        NavigateAction: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "navigate";
+            /** Href */
+            href: string;
+        };
+        /** NextStep */
+        NextStep: {
+            /** Title */
+            title: string;
+            /** Reason */
+            reason: string;
+            /** Due In Days */
+            due_in_days: number;
+            /**
+             * Related Type
+             * @enum {string}
+             */
+            related_type: "company" | "contact" | "deal";
+            /**
+             * Related Id
+             * Format: uuid
+             */
+            related_id: string;
         };
         /** NoteCreate */
         NoteCreate: {
@@ -1117,6 +1588,46 @@ export interface components {
              * @default true
              */
             ok: boolean;
+        };
+        /** OpenRecordAction */
+        OpenRecordAction: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "open_record";
+            /** Record Type */
+            record_type: string;
+            /** Record Id */
+            record_id: string;
+        };
+        /**
+         * PageContext
+         * @description What the user is looking at when they talk to the agent.
+         */
+        PageContext: {
+            /**
+             * Route
+             * @default /
+             */
+            route?: string;
+            /** Record Type */
+            record_type?: ("company" | "contact" | "deal") | null;
+            /** Record Id */
+            record_id?: string | null;
+            /** Pipeline Id */
+            pipeline_id?: string | null;
+            /** Selected Ids */
+            selected_ids?: string[];
+            /** Visible Filters */
+            visible_filters?: {
+                [key: string]: unknown;
+            };
+            /**
+             * Timezone
+             * @description IANA zone, e.g. Europe/Berlin
+             */
+            timezone?: string | null;
         };
         /** Page[CompanyOut] */
         Page_CompanyOut_: {
@@ -1207,6 +1718,39 @@ export interface components {
             name?: string | null;
             /** Position */
             position?: number | null;
+        };
+        /** PlanEvent */
+        PlanEvent: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "plan";
+            /** Plan Id */
+            plan_id: string;
+            /** Title */
+            title: string;
+            /** Steps */
+            steps: components["schemas"]["PlanStepOut"][];
+        };
+        /** PlanStepOut */
+        PlanStepOut: {
+            /** Id */
+            id: string;
+            /** Label */
+            label: string;
+            /** Tool */
+            tool: string;
+        };
+        /** PulseAction */
+        PulseAction: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "pulse";
+            /** Target */
+            target: string;
         };
         /** QueueItem */
         QueueItem: {
@@ -1473,6 +2017,26 @@ export interface components {
              */
             pipeline: string;
         };
+        /** ThinkingEvent */
+        ThinkingEvent: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "thinking";
+            /** Label */
+            label: string;
+        };
+        /** ToastAction */
+        ToastAction: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "toast";
+            /** Text */
+            text: string;
+        };
         /** TodayOut */
         TodayOut: {
             /**
@@ -1493,6 +2057,74 @@ export interface components {
             stages: components["schemas"]["StageStat"][];
             /** Stale Deals */
             stale_deals: components["schemas"]["DealOut"][];
+        };
+        /** TokenEvent */
+        TokenEvent: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "token";
+            /** Text */
+            text: string;
+        };
+        /** ToolCallEvent */
+        ToolCallEvent: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "tool_call";
+            /** Call Id */
+            call_id: string;
+            /** Tool */
+            tool: string;
+            /** Label */
+            label: string;
+            /** Args */
+            args: {
+                [key: string]: unknown;
+            };
+        };
+        /** ToolResultEvent */
+        ToolResultEvent: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "tool_result";
+            /** Call Id */
+            call_id: string;
+            /** Ok */
+            ok: boolean;
+            /** Summary */
+            summary: string;
+            /** Data */
+            data?: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /** UIActionEvent */
+        UIActionEvent: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "ui_action";
+            /** Action */
+            action: components["schemas"]["NavigateAction"] | components["schemas"]["HighlightAction"] | components["schemas"]["PulseAction"] | components["schemas"]["MoveCardAction"] | components["schemas"]["OpenRecordAction"] | components["schemas"]["ApplyFilterAction"] | components["schemas"]["InvalidateAction"] | components["schemas"]["ToastAction"];
+        };
+        /** UndoIn */
+        UndoIn: {
+            /** Action Ids */
+            action_ids: string[];
+        };
+        /** UndoOut */
+        UndoOut: {
+            /** Undone Action Ids */
+            undone_action_ids: string[];
+            /** Ui Actions */
+            ui_actions: (components["schemas"]["NavigateAction"] | components["schemas"]["HighlightAction"] | components["schemas"]["PulseAction"] | components["schemas"]["MoveCardAction"] | components["schemas"]["OpenRecordAction"] | components["schemas"]["ApplyFilterAction"] | components["schemas"]["InvalidateAction"] | components["schemas"]["ToastAction"])[];
         };
         /** UserOut */
         UserOut: {
@@ -3148,6 +3780,303 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TodayOut"];
+                };
+            };
+        };
+    };
+    chat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChatIn"];
+            };
+        };
+        responses: {
+            /** @description Stream of AgentEvent JSON objects */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    approve_plan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                plan_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ApproveIn"] | null;
+            };
+        };
+        responses: {
+            /** @description Stream of AgentEvent JSON objects */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reject_plan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                plan_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OkOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    undo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UndoIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UndoOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_conversations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConversationOut"][];
+                };
+            };
+        };
+    };
+    get_conversation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConversationDetailOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    insights: {
+        parameters: {
+            query: {
+                record_type: "company" | "contact" | "deal";
+                record_id: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Insight"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    briefing: {
+        parameters: {
+            query?: {
+                timezone?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Briefing"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    briefing_stream: {
+        parameters: {
+            query?: {
+                timezone?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Stream of AgentEvent JSON objects */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    events_schema: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": (components["schemas"]["MessageStartEvent"] | components["schemas"]["TokenEvent"] | components["schemas"]["ThinkingEvent"] | components["schemas"]["PlanEvent"] | components["schemas"]["ToolCallEvent"] | components["schemas"]["ToolResultEvent"] | components["schemas"]["UIActionEvent"] | components["schemas"]["CardEvent"] | components["schemas"]["MessageEndEvent"] | components["schemas"]["ErrorEvent"])[];
                 };
             };
         };
