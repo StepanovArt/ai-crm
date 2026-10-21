@@ -39,6 +39,21 @@ export function setPageContextProvider(fn: () => PageContext) {
   contextProvider = fn;
 }
 
+let sendQueue: Promise<void> = Promise.resolve();
+
+/** Resolves once no agent run is streaming or animating. */
+function whenIdle(): Promise<void> {
+  if (!useAgentStore.getState().streaming) return Promise.resolve();
+  return new Promise((resolve) => {
+    const unsubscribe = useAgentStore.subscribe((s) => {
+      if (!s.streaming) {
+        unsubscribe();
+        resolve();
+      }
+    });
+  });
+}
+
 function tempId() {
   return `local-${Math.random().toString(36).slice(2)}`;
 }
@@ -80,16 +95,24 @@ export const useAgentStore = create<AgentState>((set, get) => {
     streaming: false,
     controller: null,
 
-    async send(text) {
+    send(text) {
       const message = text.trim();
-      if (!message || get().streaming) return;
+      if (!message) return Promise.resolve();
       useUIStore.getState().setAgentPanelOpen(true);
+      // Show the message right away; if a run (or its UI animations) is still going, start once
+      // it finishes instead of dropping the message. Sends are serialized.
       set((s) => ({ messages: [...s.messages, { role: "user", id: tempId(), text: message }] }));
-      await runStream("/api/v1/agent/chat", {
-        conversation_id: get().conversationId,
-        message,
-        context: contextProvider(),
-      });
+      sendQueue = sendQueue
+        .then(async () => {
+          await whenIdle();
+          await runStream("/api/v1/agent/chat", {
+            conversation_id: get().conversationId,
+            message,
+            context: contextProvider(),
+          });
+        })
+        .catch(() => undefined);
+      return sendQueue;
     },
 
     async approve(planId) {
