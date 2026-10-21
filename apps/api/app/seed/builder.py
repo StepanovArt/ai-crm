@@ -490,8 +490,39 @@ class WorkspaceBuilder:
                 )
 
         await self._create_notes()
+        self._assign_lead_statuses()
         await self.session.flush()
         return self.activity_count
+
+    def _assign_lead_statuses(self) -> None:
+        """Lead status follows the furthest deal a contact is on, else whether we reached out."""
+        touched = {
+            a.related_id
+            for a in self.session.new
+            if isinstance(a, Activity) and a.related_type == "contact"
+        }
+        best: dict[uuid.UUID, str] = {}
+        for plan in self.deal_plans:
+            cid = plan.deal.primary_contact_id
+            if cid is None:
+                continue
+            kind = self.stages[plan.stage_index].kind
+            status = (
+                "customer"
+                if kind == "won"
+                else "unqualified"
+                if kind == "lost"
+                else "qualified"
+                if plan.stage_index >= 1
+                else "contacted"
+            )
+            rank = ["new", "contacted", "unqualified", "qualified", "customer"]
+            if rank.index(status) > rank.index(best.get(cid, "new")):
+                best[cid] = status
+        for contact in self.contacts:
+            contact.lead_status = best.get(
+                contact.id, "contacted" if contact.id in touched else "new"
+            )
 
     def _interaction(
         self,

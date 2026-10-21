@@ -19,7 +19,7 @@ from app.schemas.records import (
 )
 from app.services import fields as fields_service
 from app.services.activities import record_activity
-from app.services.common import diff_changes, ensure_member, purge_related
+from app.services.common import diff_changes, ensure_member, humanize_changes, purge_related
 from app.services.contacts import brief as contact_brief
 from app.services.context import Ctx
 from app.services.listing import ListParams, like, sort_clauses
@@ -280,10 +280,8 @@ async def update_deal(ctx: Ctx, deal_id: uuid.UUID, data: DealUpdate) -> DealOut
         deal.custom = await fields_service.validate_custom(
             ctx, "deal", patch["custom"], existing=deal.custom, partial=True
         )
-    labels = {
-        **LABELS,
-        **{d.key: d.label for d in await fields_service.list_definitions(ctx, "deal")},
-    }
+    defs = await fields_service.list_definitions(ctx, "deal")
+    labels = {**LABELS, **{d.key: d.label for d in defs}}
     changes = diff_changes(
         {**before, **before_custom},
         {**{k: getattr(deal, k) for k in _BUILTIN}, **(deal.custom or {})},
@@ -291,6 +289,7 @@ async def update_deal(ctx: Ctx, deal_id: uuid.UUID, data: DealUpdate) -> DealOut
     )
     await ctx.session.flush()
     if changes:
+        changes = await humanize_changes(ctx, changes, defs)
         await record_activity(ctx, "field_updated", "deal", deal.id, {"changes": changes})
     if "primary_contact_id" in patch:
         await _rescore(ctx, [before.get("primary_contact_id"), deal.primary_contact_id])

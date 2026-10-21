@@ -23,3 +23,8 @@ One line per decision: what and why.
 - 2026-10-21 — Deal moves take a target `index` in the column; the server computes a float position between neighbours, so clients and the agent never compute positions.
 - 2026-10-21 — Added `GET /pipelines/{id}/board` (stages + totals + deals in one call) for the kanban; `/deals` list remains for tables.
 - 2026-10-21 — Response models set `json_schema_serialization_defaults_required` so generated TS types mark always-present fields as required; money uses a `Money` type that always serializes as a 2-decimal string.
+- 2026-10-21 — Table/record UI is driven by "field descriptors": system columns are declared once per object in `lib/records/descriptors.ts` and custom fields are appended from `/fields`, so FieldRenderer/FieldEditor are shared by tables and detail panels.
+- 2026-10-21 — Table view state (view tab, search, sort, ad-hoc filter) lives in the URL. Saved views are code-defined presets (All/Mine/Hot/Stale…) rather than persisted server objects — enough for the MVP and lets the agent's `apply_filter`/`navigate` drive tables.
+- 2026-10-21 — Inline edits open a small popover editor anchored to the cell (Attio-style) instead of swapping the cell for an input, to avoid row height jumps; clicking the name cell opens the record.
+- 2026-10-21 — openapi-typescript runs with `--default-non-nullable false` so request fields with server defaults stay optional in TS.
+- 2026-10-21 — No row virtualization yet; tables render up to 500 rows per page. Revisit in Phase 9 if 500-row scrolling isn't smooth.

@@ -8,7 +8,7 @@ from app.models import Activity, Company, Contact, Deal, Stage
 from app.schemas.records import CompanyCreate, CompanyFilter, CompanyOut, CompanyUpdate
 from app.services import fields as fields_service
 from app.services.activities import record_activity
-from app.services.common import diff_changes, ensure_member, purge_related
+from app.services.common import diff_changes, ensure_member, humanize_changes, purge_related
 from app.services.context import Ctx
 from app.services.listing import ListParams, like, sort_clauses
 from app.services.scoping import get_scoped, scoped
@@ -159,10 +159,8 @@ async def update_company(ctx: Ctx, company_id: uuid.UUID, data: CompanyUpdate) -
         company.custom = await fields_service.validate_custom(
             ctx, "company", patch["custom"], existing=company.custom, partial=True
         )
-    labels = {
-        **LABELS,
-        **{d.key: d.label for d in await fields_service.list_definitions(ctx, "company")},
-    }
+    defs = await fields_service.list_definitions(ctx, "company")
+    labels = {**LABELS, **{d.key: d.label for d in defs}}
     changes = diff_changes(
         {**before, **before_custom},
         {**{k: getattr(company, k) for k in _BUILTIN}, **(company.custom or {})},
@@ -170,6 +168,7 @@ async def update_company(ctx: Ctx, company_id: uuid.UUID, data: CompanyUpdate) -
     )
     await ctx.session.flush()
     if changes:
+        changes = await humanize_changes(ctx, changes, defs)
         await record_activity(ctx, "field_updated", "company", company.id, {"changes": changes})
     return await get_company(ctx, company.id)
 

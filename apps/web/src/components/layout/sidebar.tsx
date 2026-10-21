@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useMe } from "@/hooks/use-auth";
 import { useTerms } from "@/hooks/use-workspace";
 import { agentId } from "@/lib/agent-ids";
 import { api, unwrap } from "@/lib/api/client";
@@ -18,14 +19,17 @@ import { navItems, settingsItem, type NavItem } from "./nav-items";
 import { WorkspaceSwitcher } from "./workspace-switcher";
 
 function useOverdueCount() {
+  const { data: me } = useMe();
+  const filter = { bucket: "overdue", assignee_id: me?.user.id };
   const { data } = useQuery({
-    queryKey: qk.tasks.list({ filter: { bucket: "overdue" }, limit: 1 }),
+    queryKey: qk.tasks.list({ filter, limit: 1 }),
     queryFn: () =>
       unwrap(
         api.GET("/api/v1/tasks", {
-          params: { query: { filter: JSON.stringify({ bucket: "overdue" }), limit: 1 } },
+          params: { query: { filter: JSON.stringify(filter), limit: 1 } },
         }),
       ),
+    enabled: Boolean(me),
   });
   return data?.total ?? 0;
 }

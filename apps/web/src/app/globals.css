@@ -223,3 +223,25 @@
     }
   }
 }
+
+/* Record detail: left (fields) · centre (timeline) · right (insight, tasks, related). */
+.record-grid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "left" "center" "right";
+}
+@container (min-width: 46rem) {
+  .record-grid {
+    grid-template-columns: 17rem minmax(0, 1fr);
+    grid-template-areas: "left center" "right center";
+    grid-template-rows: auto 1fr;
+  }
+}
+@container (min-width: 74rem) {
+  .record-grid {
+    grid-template-columns: 18rem minmax(0, 1fr) 19rem;
+    grid-template-areas: "left center right";
+    grid-template-rows: auto;
+  }
+}

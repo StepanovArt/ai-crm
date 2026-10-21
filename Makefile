@@ -37,7 +37,7 @@ dev-web:
 
 types: ## Regenerate web API types from the api OpenAPI schema
 	cd $(API) && $(UV) run python -m app.openapi_export > ../web/openapi.json
-	cd $(WEB) && pnpm exec openapi-typescript openapi.json -o src/lib/api/schema.d.ts && rm openapi.json
+	cd $(WEB) && pnpm exec openapi-typescript openapi.json --default-non-nullable false -o src/lib/api/schema.d.ts && rm openapi.json
 
 lint:
 	cd $(API) && $(UV) run ruff check . && $(UV) run ruff format --check .

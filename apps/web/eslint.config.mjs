@@ -25,6 +25,10 @@ const eslintConfig = [
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
     },
   },
+  {
+    files: ["tests/**/*.ts"],
+    rules: { "react-hooks/rules-of-hooks": "off" },
+  },
 ];
 
 export default eslintConfig;

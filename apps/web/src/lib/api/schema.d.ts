@@ -704,7 +704,7 @@ export interface components {
              * Last Name
              * @default
              */
-            last_name: string;
+            last_name?: string;
             /** Company Id */
             company_id?: string | null;
             /** Email */
@@ -720,7 +720,7 @@ export interface components {
              * @default new
              * @enum {string}
              */
-            lead_status: "new" | "contacted" | "qualified" | "unqualified" | "customer";
+            lead_status?: "new" | "contacted" | "qualified" | "unqualified" | "customer";
             /** Custom */
             custom?: {
                 [key: string]: unknown;
@@ -809,12 +809,12 @@ export interface components {
              * Value
              * @default 0
              */
-            value: number | string;
+            value?: number | string;
             /**
              * Currency
              * @default USD
              */
-            currency: string;
+            currency?: string;
             /** Company Id */
             company_id?: string | null;
             /** Primary Contact Id */
@@ -943,7 +943,7 @@ export interface components {
              * Is Required
              * @default false
              */
-            is_required: boolean;
+            is_required?: boolean;
         };
         /** FieldDefinitionOut */
         FieldDefinitionOut: {
@@ -1305,17 +1305,17 @@ export interface components {
              * Color
              * @default slate
              */
-            color: string;
+            color?: string;
             /**
              * Probability
              * @default 10
              */
-            probability: number;
+            probability?: number;
             /**
              * Kind
              * @default open
              */
-            kind: string;
+            kind?: string;
             /** Position */
             position?: number | null;
         };

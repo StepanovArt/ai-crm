@@ -1,7 +1,7 @@
 # Progress
 
 ## Current phase
-Phase 4 — Records UI
+Phase 5 — Pipeline & Today
 
 ## Phase 0 — Scaffold ✅
 - [x] Monorepo layout, docker-compose (Postgres 16), `.env.example`, Makefile
@@ -37,8 +37,19 @@ Phase 4 — Records UI
 - [x] Playwright: login redirect + sign-in + nav; wrong password
 - Screens: `docs/screens/phase-3/`
 
+## Phase 4 — Records UI ✅
+- [x] Field descriptors (`lib/records/descriptors.ts`) unify system columns + custom field definitions → tables and detail panels need no code for new fields
+- [x] FieldRenderer / FieldEditor / EditableField (popover editors for all 12 field types + stage/lead status/owner)
+- [x] Generic DataTable (TanStack Table): server-side sort, sticky header + first column, row selection, column visibility (persisted), skeleton + empty states
+- [x] Companies / Contacts / Deals pages: saved view tabs, owner/stage filters, ad-hoc filter chips (URL-driven so the agent can apply filters), debounced search, bulk assign/delete, create dialogs (`C` shortcut)
+- [x] Record detail: header + stats, fields panel, timeline (day groups, typed activity rendering, note composer), tasks, related records
+- [x] Tasks page: Overdue / Today / Upcoming / Done with optimistic completion + quick add
+- [x] Field-change activities store display names (owner names, option labels) instead of ids
+- [x] Playwright: create → inline edit → delete company; API-created custom field shows in table + detail; note on timeline; complete task
+- Screens: `docs/screens/phase-4/`
+
 ## Next
-- Phase 4: DataTable + FieldRenderer/FieldEditor, companies/contacts/deals tables, record detail, tasks page
+- Phase 5: kanban (dnd-kit, optimistic move + rollback, column totals, filters), Today dashboard, Settings (fields, pipelines/stages, terminology)
 
 ## Known issues
 - none

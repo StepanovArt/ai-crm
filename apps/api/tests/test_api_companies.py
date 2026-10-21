@@ -75,3 +75,21 @@ async def test_company_validation_errors(client: AsyncClient) -> None:
     assert unknown_filter.status_code == 422
     bad_sort = await client.get(f"{API}/companies", params={"sort": "password"})
     assert bad_sort.status_code == 422
+
+
+async def test_field_updated_activity_uses_display_names(client: AsyncClient) -> None:
+    members = (await client.get(f"{API}/workspaces/current")).json()["members"]
+    company = (await client.get(f"{API}/companies", params={"q": "acme"})).json()["items"][0]
+    other = next(m for m in members if m["id"] != company["owner_id"])
+    await client.patch(
+        f"{API}/companies/{company['id']}",
+        json={"owner_id": other["id"], "custom": {"plan_tier": "enterprise"}},
+    )
+    timeline = (
+        await client.get(
+            f"{API}/activities", params={"related_type": "company", "related_id": company["id"]}
+        )
+    ).json()
+    changes = {c["field"]: c for c in timeline[0]["payload"]["changes"]}
+    assert changes["owner_id"]["to"] == other["full_name"]
+    assert changes["plan_tier"]["to"] == "Enterprise"
