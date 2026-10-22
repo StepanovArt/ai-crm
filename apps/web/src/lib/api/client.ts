@@ -2,7 +2,14 @@ import createClient from "openapi-fetch";
 
 import type { components, paths } from "./schema";
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+/**
+ * Where the API lives. Unset → local dev API. Empty string → same origin: the browser calls
+ * `/api/...` on the current host and a reverse proxy / Kubernetes ingress routes it (Docker
+ * images are built this way, so one image works on any domain).
+ */
+const RAW_API_URL = process.env.NEXT_PUBLIC_API_URL;
+export const API_URL =
+  RAW_API_URL === undefined ? "http://localhost:8000" : RAW_API_URL.replace(/\/$/, "");
 
 export const api = createClient<paths>({ baseUrl: API_URL, credentials: "include" });
 

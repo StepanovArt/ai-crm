@@ -1,7 +1,7 @@
 import asyncio
 from logging.config import fileConfig
 
-from sqlalchemy import pool
+from sqlalchemy import pool, text
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
@@ -31,10 +31,22 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
+# Arbitrary app-wide key for pg_advisory_lock.
+MIGRATION_LOCK_KEY = 72_311_906
+
+
 def do_run_migrations(connection: Connection) -> None:
-    context.configure(connection=connection, target_metadata=target_metadata, compare_type=True)
-    with context.begin_transaction():
-        context.run_migrations()
+    # Several API pods can start (and migrate) at once. A session-level advisory lock makes them
+    # take turns: the first applies the migrations, the others then find nothing left to do.
+    connection.execute(text("SELECT pg_advisory_lock(:key)"), {"key": MIGRATION_LOCK_KEY})
+    connection.commit()
+    try:
+        context.configure(connection=connection, target_metadata=target_metadata, compare_type=True)
+        with context.begin_transaction():
+            context.run_migrations()
+    finally:
+        connection.execute(text("SELECT pg_advisory_unlock(:key)"), {"key": MIGRATION_LOCK_KEY})
+        connection.commit()
 
 
 async def run_async_migrations() -> None:

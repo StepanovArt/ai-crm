@@ -41,6 +41,11 @@ class ForbiddenError(AppError):
     code = "forbidden"
 
 
+class ServiceUnavailableError(AppError):
+    status_code = 503
+    code = "unavailable"
+
+
 def _error_body(code: str, message: str, details: Any = None) -> dict[str, Any]:
     body: dict[str, Any] = {"code": code, "message": message}
     if details is not None:
