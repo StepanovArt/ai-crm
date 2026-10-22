@@ -1,0 +1,23 @@
+# One-off Job: (re)create the demo workspace (demo@halo.dev / demo1234).
+# Jobs are immutable, so re-run it with:  kubectl replace --force -f deploy/k8s/seed-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: seed-demo
+  namespace: halo
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 600 # clean up the finished Job after 10 minutes
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: seed
+          image: halo-api:local
+          imagePullPolicy: IfNotPresent
+          command: ["python", "-m", "app.seed"]
+          envFrom:
+            - configMapRef: { name: halo-config }
+            - secretRef: { name: halo-secrets }

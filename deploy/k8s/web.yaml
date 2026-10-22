@@ -1,0 +1,70 @@
+# The Next.js frontend (standalone server). It never talks to the API itself: browsers call
+# /api/... on the same host and the Ingress routes those requests to the api Service.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxSurge: 1, maxUnavailable: 0 }
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: web
+          image: halo-web
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3000
+          readinessProbe:
+            httpGet: { path: /login, port: http }
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: /login, port: http }
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          # On shutdown Kubernetes removes the pod from the Service *while* sending SIGTERM; the
+          # ingress learns about it a moment later. Keep serving for a few seconds so in-flight
+          # routing drains to the other pods (without this, rolling updates drop ~0.5% of requests).
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "5"]
+          resources:
+            requests: { cpu: 50m, memory: 128Mi }
+            limits: { memory: 384Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: ["ALL"] }
+          volumeMounts:
+            # Next.js may write caches at runtime; everything else is read-only.
+            - { name: next-cache, mountPath: /app/.next/cache }
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - name: next-cache
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  selector:
+    app: web
+  ports:
+    - name: http
+      port: 3000
+      targetPort: http

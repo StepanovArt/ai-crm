@@ -1,0 +1,23 @@
+# One entry point for the whole app: /api/* → api, everything else → web.
+# No ingressClassName: the cluster's default controller picks it up (Traefik on k3d/k3s).
+# Traefik streams Server-Sent Events without buffering, so the agent's tokens arrive live.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: halo
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port: { name: http }
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web
+                port: { name: http }

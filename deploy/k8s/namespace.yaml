@@ -1,0 +1,5 @@
+# A namespace groups everything that belongs to the app; deleting it removes it all.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: halo

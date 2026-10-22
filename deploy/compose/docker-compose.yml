@@ -1,0 +1,87 @@
+# Production-like stack on one machine: everything runs from the built images.
+#
+#   make compose-up        # from the repo root: writes .env with a JWT secret, builds, starts, seeds
+# or by hand:
+#   cd deploy/compose
+#   echo "JWT_SECRET=$(openssl rand -hex 32)" > .env   # Compose reads .env automatically
+#   docker compose up -d --build
+#   docker compose run --rm seed                       # optional: load the demo workspace
+#   open http://localhost:8080
+#
+# Differences from `make dev`: no hot reload, ENV=prod, one origin behind nginx.
+
+name: halo
+
+x-api-env: &api-env
+  ENV: prod
+  DATABASE_URL: postgresql+asyncpg://halo:${POSTGRES_PASSWORD:-halo}@db:5432/halo
+  JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET, e.g. JWT_SECRET=$(openssl rand -hex 32)}
+  # Plain HTTP on localhost. Set to "true" as soon as the site is served over HTTPS.
+  COOKIE_SECURE: ${COOKIE_SECURE:-false}
+  LLM_PROVIDER: ${LLM_PROVIDER:-mock}
+  OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: halo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-halo}
+      POSTGRES_DB: halo
+    volumes:
+      - pgdata:/var/lib/postgresql/data   # data survives container restarts
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U halo -d halo"]
+      interval: 2s
+      retries: 30
+
+  # One-shot job: bring the schema up to date, then exit.
+  migrate:
+    image: ${HALO_API_IMAGE:-halo-api:local}
+    build: ../../apps/api
+    command: ["alembic", "upgrade", "head"]
+    environment: *api-env
+    depends_on:
+      db: { condition: service_healthy }
+    restart: "no"
+
+  # Optional one-shot job: (re)create the demo workspace. Run with `docker compose run --rm seed`.
+  seed:
+    image: ${HALO_API_IMAGE:-halo-api:local}
+    command: ["python", "-m", "app.seed"]
+    environment: *api-env
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    profiles: ["seed"]
+    restart: "no"
+
+  api:
+    image: ${HALO_API_IMAGE:-halo-api:local}
+    environment: *api-env
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    healthcheck:
+      # The slim image has no curl; Python can do the request.
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health/ready')"]
+      interval: 5s
+      retries: 20
+    restart: unless-stopped
+
+  web:
+    image: ${HALO_WEB_IMAGE:-halo-web:local}
+    build: ../../apps/web
+    depends_on:
+      api: { condition: service_healthy }
+    restart: unless-stopped
+
+  proxy:
+    image: nginx:1.27-alpine
+    ports:
+      - "${HALO_PORT:-8080}:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on: [web, api]
+    restart: unless-stopped
+
+volumes:
+  pgdata:

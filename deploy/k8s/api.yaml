@@ -1,0 +1,83 @@
+# The FastAPI backend: 2 replicas behind a Service. Each pod first runs the migrations in an
+# init container (a Postgres advisory lock makes concurrent pods take turns), then starts.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1 # start one new pod at a time...
+      maxUnavailable: 0 # ...and never drop below the desired count: zero-downtime updates
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      initContainers:
+        - name: migrate
+          image: halo-api
+          imagePullPolicy: IfNotPresent
+          command: ["alembic", "upgrade", "head"]
+          envFrom:
+            - configMapRef: { name: halo-config }
+            - secretRef: { name: halo-secrets }
+          securityContext: &hardened
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: ["ALL"] }
+      containers:
+        - name: api
+          image: halo-api
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+          envFrom:
+            - configMapRef: { name: halo-config }
+            - secretRef: { name: halo-secrets }
+          # Readiness: send traffic only when the database answers (removed from the Service otherwise).
+          readinessProbe:
+            httpGet: { path: /api/v1/health/ready, port: http }
+            periodSeconds: 5
+            failureThreshold: 3
+          # Liveness: restart the container if the process stops responding.
+          livenessProbe:
+            httpGet: { path: /api/v1/health, port: http }
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          # On shutdown Kubernetes removes the pod from the Service *while* sending SIGTERM; the
+          # ingress learns about it a moment later. Keep serving for a few seconds so in-flight
+          # routing drains to the other pods (without this, rolling updates drop ~0.5% of requests).
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "5"]
+          resources:
+            requests: { cpu: 100m, memory: 192Mi }
+            limits: { memory: 512Mi }
+          securityContext: *hardened
+          volumeMounts:
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+spec:
+  selector:
+    app: api
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http

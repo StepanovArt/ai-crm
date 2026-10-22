@@ -1,0 +1,44 @@
+# Halo CRM on Kubernetes.  Apply everything with:  kubectl apply -k deploy/k8s
+# Kustomize (built into kubectl) assembles these files, sets the namespace on every object,
+# generates the ConfigMap/Secret below and pins image tags.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: halo
+
+resources:
+  - namespace.yaml
+  - postgres.yaml
+  - api.yaml
+  - web.yaml
+  - ingress.yaml
+
+# Non-secret settings, exposed to the API as environment variables (pydantic-settings reads them).
+configMapGenerator:
+  - name: halo-config
+    literals:
+      - ENV=prod
+      - LLM_PROVIDER=mock
+      - AGENT_DELAY_SCALE=1.0
+      # Plain HTTP on a local cluster. Switch to "true" once the ingress serves HTTPS.
+      - COOKIE_SECURE=false
+
+# Secrets come from deploy/k8s/secrets.env (git-ignored). Create it with `make k8s-secrets`
+# or copy secrets.env.example.
+secretGenerator:
+  - name: halo-secrets
+    envs:
+      - secrets.env
+
+generatorOptions:
+  # Keep stable names so the seed Job can reference them. After changing config or secrets run
+  # `kubectl -n halo rollout restart deployment/api` to pick up the new values.
+  disableNameSuffixHash: true
+
+# Which image builds to run. For a registry, set newName/newTag here, e.g. with the standalone
+# kustomize CLI: `kustomize edit set image halo-api=ghcr.io/you/halo-api:<sha>`.
+images:
+  - name: halo-api
+    newTag: local
+  - name: halo-web
+    newTag: local
