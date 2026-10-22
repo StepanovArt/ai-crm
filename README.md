@@ -207,6 +207,25 @@ approved plans, and register it in `app/agent/providers/__init__.py`.
 
 ---
 
+## Deployment: Docker and Kubernetes
+
+Both apps ship as container images, and the repo includes a production-style Docker Compose stack
+and Kubernetes manifests. [`docs/deploy.md`](docs/deploy.md) walks through all of it step by step.
+
+```bash
+make compose-up                          # whole stack on one machine → http://localhost:8080
+
+make docker-build && make k3d-up && make k3d-load \
+  && make k8s-secrets && make k8s-deploy && make k8s-seed    # local Kubernetes → http://localhost:8080
+```
+
+On Kubernetes: 2 API and 2 web replicas behind an ingress, Postgres as a StatefulSet with a
+persistent volume, migrations in an init container (a Postgres advisory lock serializes concurrent
+pods), readiness and liveness probes, zero-downtime rolling updates, and hardened non-root
+containers.
+
+---
+
 ## Project layout
 
 ```
@@ -219,13 +238,15 @@ apps/
       agent/                orchestrator, tools, providers, scenarios, insights, undo
       onboarding/           industry templates + streamed workspace generator
       seed/                 deterministic workspace builder (demo + onboarding)
-    tests/                  pytest (126 tests: API, isolation, agent scenarios, undo, query counts)
+    tests/                  pytest (129 tests: API, isolation, agent scenarios, undo, query counts)
   web/                      Next.js 15 · Tailwind v4 · shadcn/ui · TanStack Query/Table · motion
     src/
       app/                  routes: (auth), onboarding, (app)/today|pipeline|deals|…
       components/           ui primitives, layout, records, pipeline, agent, onboarding
       hooks/  stores/  lib/ data hooks, zustand stores, agent protocol/executor, utils
     tests/e2e/              Playwright (auth, records, pipeline, settings, agent, onboarding, a11y)
+deploy/compose/             production-style Docker Compose stack (nginx in front)
+deploy/k8s/                 Kubernetes manifests (Kustomize), see docs/deploy.md
 docs/screens/               screenshots per phase
 ```
 
@@ -244,13 +265,16 @@ docs/screens/               screenshots per phase
 | `make lint` / `make typecheck` / `make test` | ruff + ESLint · mypy (strict on agent/services) + tsc · pytest + Vitest |
 | `make check` | all of the above |
 | `make e2e` | Playwright end-to-end tests, including an axe WCAG 2.1 AA audit (needs `make dev` running) |
+| `make docker-build` | build the `halo-api` and `halo-web` images |
+| `make compose-up` / `make compose-down` | production-style stack in Docker Compose on `:8080` |
+| `make k3d-up` · `k3d-load` · `k8s-secrets` · `k8s-deploy` · `k8s-seed` · `k3d-down` | local Kubernetes cluster, see [`docs/deploy.md`](docs/deploy.md) |
 
 The demo can also be reset from the app (workspace menu → *Reset demo data*) or with
 `POST /api/v1/demo/reset` (disabled when `ENV=prod`).
 
 ### Quality gates
 
-- **API:** 126 pytest tests. They cover every router's happy and error paths, workspace
+- **API:** 129 pytest tests. They cover every router's happy and error paths, workspace
   isolation, field validation, scoring, each agent scenario's event sequence and database
   effects, exact undo, onboarding (*"We sell apartments in new developments"* → a real-estate
   workspace), the OpenAI-compatible provider, and SQL query counts (no N+1, 500-row lists in

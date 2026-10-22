@@ -94,6 +94,14 @@ All phases complete — MVP is demo-ready (see the demo script in `README.md`).
 - [x] Fresh clone → `make setup` → `make seed` (twice, idempotent) → `make dev` → full demo script (`apps/web/scripts/demo-run.mjs`) passes with no browser errors; `make check` (126 pytest, 26 Vitest, ruff, mypy, ESLint, tsc) and `make e2e` (28 Playwright tests) green
 - Screens: `docs/screens/phase-9/`
 
+## After the MVP — containers & Kubernetes ✅
+- [x] Dockerfiles for api and web (multi-stage, non-root, same-origin API URL), `.dockerignore`s
+- [x] `deploy/compose`: db → migrate → api → web → nginx; full demo script passes through the proxy; SSE unbuffered
+- [x] `deploy/k8s` (Kustomize): Namespace, ConfigMap, Secret, Postgres StatefulSet + PVC, api/web Deployments (init-container migrations, probes, preStop, hardened security context), Services, Ingress, seed Job
+- [x] Verified on k3s v1.31: full demo script through the ingress; 0/5,912 failed requests during rolling restarts; data survives deleting the database pod; deleted pods are replaced
+- [x] App changes: readiness endpoint, prod JWT-secret guard, migration advisory lock (129 API tests)
+- Guide: `docs/deploy.md`
+
 ## Known limitations
 - The mock agent understands the demo intents (Section 12 plus a few more); anything else gets a helpful fallback. Use `LLM_PROVIDER=openai` for open-ended conversation.
 - No real email sending, calendar sync or enrichment (out of scope for the MVP).
